@@ -235,12 +235,14 @@ async function main() {
   check('a notice seen before (same jti) is a replay', !replay.ok && replay.reason === 'REPLAY');
   const strangerKey = await KeyStore.generate('stranger');
   const strangerDid = didKeyFromJwk(strangerKey.publicJwk);
-  const claims = { iss: strangerDid, aud: home.did, jti: 'urn:uuid:stranger-1', exp: Math.floor(Date.now() / 1000) + 600, credentialId: issued.record.credentialId!, presentationHash: presentationHashOf(credential), presentedAt: '2026-10-13T08:30:00.000Z', registeredAt: '2026-10-13T08:45:00.000Z' };
+  // Hand-built notices are dated from the receiving deployment's clock, as a real peer's would be
+  // from its own; the service verifies against that clock, not the wall clock.
+  const claims = { iss: strangerDid, aud: home.did, jti: 'urn:uuid:stranger-1', iat: Math.floor(home.clock.now.getTime() / 1000), exp: Math.floor(home.clock.now.getTime() / 1000) + 600, credentialId: issued.record.credentialId!, presentationHash: presentationHashOf(credential), presentedAt: '2026-10-13T08:30:00.000Z', registeredAt: '2026-10-13T08:45:00.000Z' };
   const stranger = await home.service.receive(await signJwt(strangerKey.signer, { kid: `${strangerDid}#stranger`, typ: ARRIVAL_NOTICE_TYP }, claims));
   check('a notice from a jurisdiction not in the trust list is refused', !stranger.ok && stranger.reason === 'UNTRUSTED_PEER');
   const misaddressed = await home.service.receive(await signJwt(peer.key.signer, { kid: `${peer.did}#${peer.key.kid}`, typ: ARRIVAL_NOTICE_TYP }, { ...claims, iss: peer.did, jti: 'urn:uuid:aud-1', aud: strangerDid }));
   check('a notice addressed to another deployment is refused', !misaddressed.ok && misaddressed.reason === 'NOT_ADDRESSED_TO_THIS_DEPLOYMENT');
-  const expired = await home.service.receive(await signJwt(peer.key.signer, { kid: `${peer.did}#${peer.key.kid}`, typ: ARRIVAL_NOTICE_TYP }, { ...claims, iss: peer.did, jti: 'urn:uuid:exp-1', exp: Math.floor(Date.now() / 1000) - 60 }));
+  const expired = await home.service.receive(await signJwt(peer.key.signer, { kid: `${peer.did}#${peer.key.kid}`, typ: ARRIVAL_NOTICE_TYP }, { ...claims, iss: peer.did, jti: 'urn:uuid:exp-1', exp: Math.floor(home.clock.now.getTime() / 1000) - 60 }));
   check('an expired notice is refused', !expired.ok && expired.reason === 'EXPIRED');
   const leaky = await home.service.receive(await signJwt(peer.key.signer, { kid: `${peer.did}#${peer.key.kid}`, typ: ARRIVAL_NOTICE_TYP }, { ...claims, iss: peer.did, jti: 'urn:uuid:pii-1', fullName: 'A. Person' }));
   check('a notice carrying anything about the person is refused outright', !leaky.ok && leaky.reason === 'UNEXPECTED_CLAIM_fullName');
