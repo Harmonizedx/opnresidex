@@ -9,6 +9,7 @@ import {
 import { interpolate, interpolateObject } from '../util';
 import { buildAuthHeaders, resultFromBody } from '../mapping';
 import { RetryPolicy, resolveRetryPolicy, withRetry } from '../retry';
+import { requireSubjectPepper } from '../subject-pepper';
 
 /**
  * A foundational provider that is driven ENTIRELY by configuration.
@@ -31,7 +32,7 @@ export class GenericRestAdapter implements FoundationalProvider {
   private pepper: string;
   private retry!: RetryPolicy;
 
-  constructor(code = 'GENERIC_REST', pepper = process.env.SUBJECT_PEPPER ?? 'dev-pepper') {
+  constructor(code = 'GENERIC_REST', pepper = requireSubjectPepper()) {
     this.code = code;
     this.pepper = pepper;
   }

@@ -11,6 +11,7 @@ import { tokenizeSubject } from '../util';
 // Type-only: this adapter is handed a client, it never constructs one, so nothing in the
 // foundational context depends on the oidc context at run time.
 import type { UpstreamOidcClient } from '../../oidc/upstream-oidc';
+import { requireSubjectPepper } from '../subject-pepper';
 
 /**
  * An OpenID Connect provider as a foundational source.
@@ -55,7 +56,7 @@ export class OidcFoundationalAdapter implements FoundationalProvider {
   constructor(
     code: string,
     private client?: UpstreamOidcClient,
-    private pepper: string = process.env.SUBJECT_PEPPER ?? 'dev-pepper',
+    private pepper: string = requireSubjectPepper(),
   ) {
     this.code = code;
   }

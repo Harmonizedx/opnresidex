@@ -11,6 +11,7 @@ import {
 } from '../types';
 import { getPath, parseCsv } from '../util';
 import { applicantBindingFrom, mapIdentity } from '../mapping';
+import { requireSubjectPepper } from '../subject-pepper';
 
 /**
  * A foundational provider that verifies against an IMPORTED register extract rather than a
@@ -32,7 +33,7 @@ export class DatasetFileAdapter implements FoundationalProvider {
   private pepper: string;
   private index = new Map<string, Record<string, unknown>>();
 
-  constructor(code = 'DATASET_FILE', pepper = process.env.SUBJECT_PEPPER ?? 'dev-pepper') {
+  constructor(code = 'DATASET_FILE', pepper = requireSubjectPepper()) {
     this.code = code;
     this.pepper = pepper;
   }

@@ -19,6 +19,7 @@ import {
   ProviderConfig,
 } from '../types';
 import { identifierNamespace, tokenizeSubject } from '../util';
+import { requireSubjectPepper } from '../subject-pepper';
 
 /**
  * MOSIP ID Authentication (IDA) as a foundational provider.
@@ -182,7 +183,7 @@ export class MosipIdaAdapter implements FoundationalProvider {
   private pepper: string;
 
   constructor(
-    pepper = process.env.SUBJECT_PEPPER ?? 'dev-pepper',
+    pepper = requireSubjectPepper(),
     private fetchImpl: typeof fetch = fetch,
   ) {
     this.pepper = pepper;

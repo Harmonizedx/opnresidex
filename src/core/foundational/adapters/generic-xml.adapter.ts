@@ -9,6 +9,7 @@ import {
 import { interpolate, interpolateObject, parseXml } from '../util';
 import { buildAuthHeaders, resultFromBody } from '../mapping';
 import { RetryPolicy, resolveRetryPolicy, withRetry } from '../retry';
+import { requireSubjectPepper } from '../subject-pepper';
 
 /**
  * A config-driven foundational provider for XML and SOAP national-ID services.
@@ -30,7 +31,7 @@ export class GenericXmlAdapter implements FoundationalProvider {
   private pepper: string;
   private retry!: RetryPolicy;
 
-  constructor(code = 'GENERIC_XML', pepper = process.env.SUBJECT_PEPPER ?? 'dev-pepper') {
+  constructor(code = 'GENERIC_XML', pepper = requireSubjectPepper()) {
     this.code = code;
     this.pepper = pepper;
   }
