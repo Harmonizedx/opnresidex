@@ -114,7 +114,9 @@ the address they are counted as. See [ADR-0013](adr/0013-rate-limiting-identifie
 
 `operatorAuth`, `messaging`, `contactDirectory`, `presentation` and `oidc.subjectType`
 are deployment-wide, and are read from the first config loaded — files are loaded in
-sorted filename order. If you run several countries from one deployment, put these blocks
+sorted filename order. A deployment serves one jurisdiction
+([ADR-0004](adr/0004-one-deployment-one-jurisdiction.md)) and normally ships one config. If
+the config directory holds more than one file, as the development tree does, put these blocks
 in the config that sorts first, or the mode you get will not be the mode you wrote.
 
 ## Hosting in the jurisdiction's country
@@ -283,7 +285,6 @@ Revisit when a second service exists.
 - The foundational provider secret named by each config's `foundational.auth.secretEnv`
   (e.g. `NIN_GATEWAY_KEY`). A missing one now fails at the point of use instead of
   sending an empty header and surfacing the gateway's 401 as an unexplained error.
-- A real SSO authentication factor in `src/sso/interaction.controller.ts`.
 - Confirmed national ID API contract and legal basis with each identity authority.
 - A data protection impact assessment and records of processing.
 - Backups and monitoring for Postgres; log shipping for the audit trail.

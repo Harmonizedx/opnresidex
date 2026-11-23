@@ -505,7 +505,8 @@ OpenResidency is built to the DPG Standard: **Apache-2.0**, open standards end t
 Verifiable Credentials & DIDs, OpenID Connect, OpenID4VCI/VP, W3C Bitstring Status List), and
 privacy- and rights-by-design (national-ID tokenization, per-service consent, an enforced
 separation of residency from origin/ancestral status). It supports **SDG 16.9** (legal identity for
-all) and, through inclusive service access, SDGs 1, 3, and 10. Building on open standards keeps it
+all), with SDGs 1, 5, 8, 10 and 16 as supporting goals; [`docs/SDG.md`](docs/SDG.md) is the
+authoritative list and anchors each one to a capability in the code. Building on open standards keeps it
 interoperable with any conformant wallet, verifier, or relying party and avoids the proprietary
 lock-in that would disqualify it as a DPG.
 
@@ -572,13 +573,15 @@ Certify instance, a registered eSignet client, and a MISP partner agreement are 
 cannot hold. [`docs/MOSIP.md`](docs/MOSIP.md) draws that line explicitly, surface by surface. No
 MOSIP certification, compliance or partnership is claimed.
 
-**Not run in CI, and not claimed:** the official
+**Not run in CI:** the official
 [`w3c/vc-data-model-2.0-test-suite`](https://github.com/w3c/vc-data-model-2.0-test-suite). It needs
 a live server and a database, so it cannot gate a commit. We expose the
 [VC-API](https://w3c-ccg.github.io/vc-api/) endpoints it drives, and ship the config and a runner
 (`npm run test:w3c`), so that anyone can point it at an instance and see the result for themselves.
-[`test/w3c/README.md`](test/w3c/README.md) explains how, and is candid about what we expect it to
-surface. **We do not claim to pass it.** If you run it, please open an issue with the output.
+[`test/w3c/README.md`](test/w3c/README.md) explains how, and records the result of running it
+against a local instance: 59 of 59. **No build enforces that number**, so it is what a local run
+gave, not a standing claim. If you run it and see anything else, please open an issue with the
+output.
 
 ## License
 

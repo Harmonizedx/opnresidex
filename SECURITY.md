@@ -52,8 +52,9 @@ upgrade tonight or next month.
 ## Deployer responsibilities
 
 This is infrastructure you self-host. You are responsible for KMS custody of the issuer
-key, a real SSO authentication factor, TLS, network controls, database security, and a
-data protection impact assessment for your jurisdiction. See `README.md` caveats and
+key, the message delivery that carries the one-time-code sign-in fallback, TLS, network
+controls, database security, and a data protection impact assessment for your jurisdiction.
+See `README.md` caveats and
 `docs/DEPLOY.md`.
 
 ## Verifying what you downloaded

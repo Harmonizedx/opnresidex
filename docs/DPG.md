@@ -258,8 +258,9 @@ illegal content) and **9c** (protection from harassment) do not apply.
 Stated openly rather than hidden, because a reviewer will find them:
 
 - The development issuer key is ephemeral; production supplies one from an HSM or KMS.
-- SMS/USSD delivery is stubbed at the gateway boundary — the state machine and webhook are
-  real, the aggregator integration is the deployer's.
+- SMS/USSD delivery is implemented and configured per deployment (a `messaging` block naming
+  an aggregator, plus a `contactDirectory`). The aggregator account and contract are the
+  deployer's; with no `messaging` block, the one-time-code fallback is switched off.
 - Proof of residence is a policy input the system records and levels, but does not adjudicate.
 - Erasure and retention are both implemented (`POST /residency/{id}/erase`,
   `POST /residency/retention/sweep`). The sweep covers residency records only, is dry-run by
@@ -275,9 +276,11 @@ Stated openly rather than hidden, because a reviewer will find them:
 
 ## Reuse beyond one country
 
-Nothing in the core is Nigeria-specific. The same binary serves multiple jurisdictions at once
-(one config file each), which makes OpenResidency suitable as shared regional infrastructure
-rather than a single-country fork.
+Nothing in the core is Nigeria-specific. The same build is deployed once per jurisdiction, each
+with its own config file, data and keys
+([ADR-0004](adr/0004-one-deployment-one-jurisdiction.md)), so a state, province or county in any
+country runs it without a fork. Deployments reach each other by verifying one another's
+credentials through the federation trust list, not by sharing a register.
 
 ---
 

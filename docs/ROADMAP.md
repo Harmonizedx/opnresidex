@@ -1,7 +1,7 @@
 # Roadmap
 
 What is planned, what triggers it, and what is deliberately not planned. Dated so a reader can
-tell a stale entry from a current one. The acceptance suite (`npm run conformance:orcs`) is the
+tell a stale entry from a current one. The acceptance suite (`npm run acceptance`) is the
 authoritative statement of what is done; this page is the statement of what is next.
 
 Updated 2026-10-06.

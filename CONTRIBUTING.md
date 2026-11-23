@@ -148,7 +148,7 @@ To run the server you also need Postgres:
 ```bash
 cp .env.example .env
 docker compose up -d db
-npx prisma db push
+npm run prisma:migrate
 npm run start:dev
 ```
 
@@ -171,9 +171,10 @@ CI runs all of these on every pull request, and builds the Docker image.
 
 `npm run test:w3c` runs [`w3c/vc-data-model-2.0-test-suite`](https://github.com/w3c/vc-data-model-2.0-test-suite)
 against a **running** instance, over the VC-API. It needs a server and a database, so it is
-not part of CI. See [`test/w3c/README.md`](test/w3c/README.md), which is explicit about what
-we have and have not run. **We do not claim to pass it.** If you run it, please open an
-issue with the output — those are the issues we most want.
+not part of CI. See [`test/w3c/README.md`](test/w3c/README.md), which records the result of
+running it against a local instance: 59 of 59. **No build enforces that number.** If you
+run it and see anything else, please open an issue with the output — those are the issues
+we most want.
 
 ## What to work on
 
@@ -181,7 +182,7 @@ issue with the output — those are the issues we most want.
 - Wallet interoperability: see [`docs/INTEROP.md`](docs/INTEROP.md). If a wallet cannot
   complete issuance, add a case to `scripts/oid4vci-smoke.ts` that reproduces its
   behaviour, watch it fail, then fix the issuer.
-- Hardening the items listed as caveats in `README.md` (real SSO factor, KMS signing).
+- Hardening the items listed as caveats in `README.md`.
 - Additional language SDKs generated from `docs/openapi.yaml`.
 - Documentation and deployment recipes.
 
@@ -236,8 +237,13 @@ Every pull request runs the automated pipeline in
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml): the Prisma client is generated, the
 project is typechecked, the core / OpenID4VCI / OpenID4VP / W3C-conformance suites all run,
 and the Docker image is built to prove `contexts/` ships in the runtime image. A pull
-request with failing checks cannot be merged. These runs are hermetic — no database, no
-network — so a green run locally (`npm test`) is a green run in CI.
+request with failing checks cannot be merged. Those suites are hermetic — no database, no
+network — so a green run locally (`npm test`) is a green run of that job in CI.
+
+Two further jobs do use PostgreSQL, and `npm test` does not cover them: `sso-e2e` boots the
+real application and drives a full sign-in, and `store-e2e` round-trips every store against
+the committed migrations. A change to a controller, a module's wiring, the Prisma schema or
+a migration can pass locally and fail there.
 
 ## Reporting bugs
 
