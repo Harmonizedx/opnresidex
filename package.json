@@ -2,7 +2,7 @@
   "name": "open-residency",
   "version": "0.3.0",
   "private": true,
-  "description": "Open-source subnational trust infrastructure that lets governments establish, manage and exchange verified, purpose-scoped jurisdictional relationships between residents and their jurisdictions \u2014 giving citizens inclusive, privacy-preserving access to public services. A Digital Public Good.",
+  "description": "Open-source subnational trust infrastructure that lets governments establish, manage and exchange verified, purpose-scoped jurisdictional relationships between residents and their jurisdictions — giving citizens inclusive, privacy-preserving access to public services. A Digital Public Good.",
   "license": "Apache-2.0",
   "author": "Chinonso Williams <nonso@harmonizedx.com>",
   "contributors": [
@@ -95,15 +95,15 @@
     "@nestjs/throttler": "^6.7.1",
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
-    "axios": "^1.21.0",
+    "axios": "^1.21.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "express": "^5.3.0",
     "helmet": "^8.1.0",
-    "jose": "^6.2.15",
+    "jose": "^6.2.17",
     "js-yaml": "^5.5.0",
     "jsonld": "^9.0.0",
-    "oidc-provider": "^9.13.3",
+    "oidc-provider": "^9.15.0",
     "pg": "^8.23.1",
     "pino": "^10.4.0",
     "prisma": "^7.10.1",
@@ -115,7 +115,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@nestjs/cli": "^11.0.24",
+    "@nestjs/cli": "^12.0.13",
     "@types/express": "^5.0.6",
     "@types/jsonld": "^1.5.15",
     "@types/node": "^26.6.6",
@@ -130,6 +130,7 @@
   },
   "overrides": {
     "deepmerge-ts": "^8.0.1",
-    "mysql2": "^3.24.4"
+    "mysql2": "^3.24.4",
+    "effect": "^3.22.1"
   }
 }

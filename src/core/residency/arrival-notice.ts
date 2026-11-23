@@ -376,7 +376,10 @@ export class ArrivalNoticeService {
     let failure = 'BAD_SIGNATURE';
     for (const key of keys) {
       try {
-        const res = await jwtVerify(jwt, key, { issuer: did, audience, typ: ARRIVAL_NOTICE_TYP, algorithms: [alg] });
+        // Verified against the same clock the service signs with. In production both are the
+        // wall clock; under an injected clock, a notice signed "now" must not be rejected as
+        // expired by a verifier reading a different "now".
+        const res = await jwtVerify(jwt, key, { issuer: did, audience, typ: ARRIVAL_NOTICE_TYP, algorithms: [alg], currentDate: this.now() });
         payload = res.payload as Record<string, unknown>;
         break;
       } catch (e) {
