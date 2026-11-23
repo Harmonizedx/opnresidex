@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * The one place a subject pepper is resolved when a caller did not supply one.
  *
