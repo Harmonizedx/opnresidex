@@ -67,14 +67,16 @@ oidc:
       postLogoutRedirectUris: [http://localhost:4001]
 ```
 
-Each RP is entitled to exactly one `sector` scope, added to the standard
-`openid profile residency` set. Introducing a new sector needs no code change — the set
-of registered scopes is derived from whatever the configured RPs actually use.
+Each RP is entitled to `openid` and exactly one `sector` scope. Anything further is listed
+per RP under `scopes` (for example `scopes: [profile]`). The `residency` scope releases
+`resident_id`, which is the same value at every service, so it is not granted by default:
+list it only for a relying party with a lawful basis for holding the number. Introducing a
+new sector needs no code change — the set of registered scopes is derived from whatever the
+configured RPs actually use.
 
 The client **secret is never in config**. It is read from `<CLIENT_ID>_CLIENT_SECRET` in
-the environment (e.g. `HEALTH_CLIENT_SECRET`), falling back to a `<id>-dev-secret`
-placeholder only when unset, so local development works with no secrets configured. Set a
-real secret per RP in production.
+the environment (e.g. `HEALTH_CLIENT_SECRET`). There is no fallback: the app refuses to
+start if a configured RP has no secret set.
 
 Omit the `oidc` block entirely and no relying parties are registered — which is what a
 deployment that does not use SSO wants.

@@ -17,19 +17,25 @@ backend re-checks.
 ## The account-linking model (why "no correlation" is fine)
 
 Your users have no pre-existing link to the resident registry, and they don't need one. Every
-authenticated citizen carries a stable `resident_id`. On the first login you decide how to bind it:
+sign-in carries a stable `sub`. It is **pairwise**: the same person always has the same `sub` at
+your service, and a different one at every other service. On the first login you decide how to
+bind it:
 
 ```
-first login  ->  do we already have this resident_id?
+first login  ->  do we already have this sub?
                    ├─ yes -> log into the existing local account
                    └─ no  -> create a local account, OR bind to an existing one
                              (match on a consented email/phone claim, or have the
                               user sign in once with their old credentials to confirm)
-                 store mapping:  local_user_id  <->  resident_id
-later logins ->  resident_id -> local account, directly
+                 store mapping:  local_user_id  <->  sub
+later logins ->  sub -> local account, directly
 ```
 
-`resident_id` is your join key. Nothing else about your schema changes.
+`sub` is your join key. Nothing else about your schema changes.
+
+The Resident ID itself (`resident_id`) is the same value at every service, so it is not released
+by default. It comes only with the `residency` scope, which the jurisdiction grants per relying
+party to services with a lawful basis for holding the number. Do not build account linking on it.
 
 ---
 
@@ -70,7 +76,7 @@ change.
 | `response_type` | `code` |
 | `grant_types` | `authorization_code`, `refresh_token` |
 | Token auth method | `client_secret_basic` |
-| Scopes to request | `openid profile residency education` (swap your sector) |
+| Scopes to request | `openid profile education` (swap your sector; add `residency` only if it has been granted to you) |
 | Issuer DID document | `GET /.well-known/did.json` |
 
 ### 3. Claims you receive
@@ -79,9 +85,9 @@ The ID token / userinfo carries **only** these, and **never the national ID numb
 
 | Scope | Claims |
 |---|---|
-| `openid` | `sub` (currently equal to `resident_id`) |
+| `openid` | `sub` (pairwise: stable for your service, different at every other), `acr`, `amr`, `auth_time` |
 | `profile` | `name`, `given_name`, `family_name`, `birthdate`, `gender` |
-| `residency` | `resident_id`, `country_code`, `subnational_unit`, `assurance_level`, `provisional` |
+| `residency` (granted per relying party, not by default) | `resident_id`, `country_code`, `subnational_unit`, `assurance_level`, `provisional` |
 
 The citizen logs in once at the state IdP and **consents per service**; consent is a first-class,
 revocable record and is written to the tamper-evident audit log.
@@ -104,7 +110,7 @@ const client = new issuer.Client({
 const code_verifier = generators.codeVerifier();
 req.session.cv = code_verifier;
 const url = client.authorizationUrl({
-  scope: 'openid profile residency education',
+  scope: 'openid profile education',
   code_challenge: generators.codeChallenge(code_verifier),
   code_challenge_method: 'S256',
 });
@@ -117,11 +123,11 @@ const tokenSet = await client.callback(
   params,
   { code_verifier: req.session.cv },
 );
-const c = tokenSet.claims();          // { sub, resident_id, subnational_unit, assurance_level, ... }
+const c = tokenSet.claims();          // { sub, acr, amr, auth_time, name, ... }
 
 // --- account linking (the one bit that is yours) ---
-let user = await db.users.findByResidentId(c.resident_id);
-if (!user) user = await db.users.create({ resident_id: c.resident_id, name: c.name });
+let user = await db.users.findBySub(c.sub);
+if (!user) user = await db.users.create({ sub: c.sub, name: c.name });
 req.session.userId = user.id;         // logged in
 ```
 
@@ -207,4 +213,4 @@ yours. You inherit identity and residency assurance; you do not surrender your d
 - [ ] **Consent & data protection.** Request the narrowest scope set you need, and confirm the
       lawful basis for the claims you consume with the identity authority.
 - [ ] **Token handling.** Validate the ID token signature against the IdP JWKS, check `aud`/`iss`,
-      and store only what you need (ideally just the `resident_id` mapping).
+      and store only what you need (ideally just the `sub` mapping).

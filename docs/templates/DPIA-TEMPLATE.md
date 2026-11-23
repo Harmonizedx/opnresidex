@@ -52,7 +52,7 @@ configuration.
 | # | Risk | Inherent | Mitigation | Residual |
 | --- | --- | --- | --- | --- |
 | 1 | **Exclusion** — a person unable to enrol loses service access | | Offline verification, USSD for feature phones, multiple evidence routes so no single document is mandatory | |
-| 2 | **Discrimination** — residency conditioned on origin, indigene status or ethnicity | | Prohibited by `CODE_OF_CONDUCT.md`; origin is recorded separately from residence and never as an eligibility input | |
+| 2 | **Discrimination** — residency conditioned on origin, indigene status or ethnicity | | Prohibited by `CODE_OF_CONDUCT.md`; the register holds no origin field in any form, and a foundational record's origin is never accepted as proof of residence ([ADR-0015](../adr/0015-indigeneity-is-not-residency.md)) | |
 | 3 | **Function creep** — the register used for purposes never assessed | | Per-relying-party scopes; consent records; this DPIA must be revised before a new purpose | |
 | 4 | **Correlation across services** — two agencies joining records on a shared identifier | | Pairwise SSO subjects; `resident_id` released only to relying parties with a lawful basis | |
 | 5 | **Re-identification from published statistics** | | Small-cell suppression, complementary suppression, withheld grand total — see `docs/API.md`. **Conduct a disclosure review before publishing.** | |
@@ -70,7 +70,7 @@ configuration.
 | Erasure | `POST /residency/{id}/erase` | |
 | Withdraw consent | `POST /consent/{id}/revoke` | |
 | Portability | Signed consent receipts; the credential is a portable W3C VC | |
-| Object / appeal | **Not implemented in software.** Define an administrative route. | |
+| Object / appeal | A refused application is recorded under a reference with its reason and the jurisdiction's appeal path; `POST /residency/refusals/{reference}/review` records a human review of it. A credential status change is refused unless it carries a reason, an authority and an appeal path. The software records the route; define who hears the appeal. | |
 
 ## 6. Decisions
 
