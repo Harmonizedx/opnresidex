@@ -737,9 +737,21 @@ export type UpstreamOidcProfile = z.infer<typeof upstreamOidcSchema>;
  * audits to the same actor, there are no roles, and rotation means restarting with every
  * client cutting over at once. It is retained so existing deployments keep working and
  * warns on every boot.
+ *
+ * ## `mode` has no default, deliberately (OR-02)
+ *
+ * It used to default to `sharedKey` — the weakest of the three — so a config that simply
+ * omitted the block got the legacy single-key mode without anyone choosing it, and every
+ * shipped country config omits it. The boot warning fired either way, which made an
+ * inherited default and a deliberate choice indistinguishable in the logs.
+ *
+ * Now absence is its own state. `OperatorIdentity` refuses to boot a production deployment
+ * on an unstated mode, and still runs on `sharedKey` with the warning outside production,
+ * so development and the shipped sample configs keep working untouched. An explicit
+ * `mode: sharedKey` is honoured everywhere — the point is that it must be written down.
  */
 const operatorAuthSchema = z.object({
-  mode: z.enum(['oidc', 'local', 'sharedKey']).default('sharedKey'),
+  mode: z.enum(['oidc', 'local', 'sharedKey']).optional(),
   /** Issuer name shown in operators' authenticator apps. */
   issuerName: z.string().default('OpenResidency'),
   oidc: z

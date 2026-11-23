@@ -170,6 +170,24 @@ export class ResidencyController {
     }
   }
 
+  /**
+   * Look up one resident's residency status.
+   *
+   * ## Why this is operator-guarded (OR-03)
+   *
+   * It was open. A residency ID is semi-public by design — printed on cards, carried in QR
+   * codes, the same reasoning the `revoke` route below states — so an unauthenticated
+   * caller holding or guessing one learned, from a 200 against a 404, that the person is
+   * registered, and then read their `subnationalUnit`, `assuranceLevel`, `provisional`
+   * flag and enrolment date. "Non-sensitive residency status only" was true field by field
+   * and wrong in aggregate: for a resident of a minority community, where they are
+   * registered is the attribute that matters, and existence alone is enough to confirm
+   * someone is in the register at all.
+   *
+   * No `@RequireRoles`: any authenticated operator may read a status. The guard is here to
+   * establish that a caller is staff, not to rank them.
+   */
+  @UseGuards(OperatorGuard)
   @Get(':residentId')
   async lookup(@Param('residentId') residentId: string) {
     const record = await this.platform.getStore().findByResidentId(residentId);
