@@ -63,9 +63,12 @@ async function main(): Promise<void> {
   const scriptSrc = csp.split(';').map((d) => d.trim()).find((d) => d.startsWith('script-src')) ?? '';
   check("script-src carries no 'unsafe-inline'", !scriptSrc.includes("'unsafe-inline'"), scriptSrc);
   check("script-src carries no 'unsafe-eval'", !scriptSrc.includes("'unsafe-eval'"), scriptSrc);
+  // Compared token by token, not by substring: a source such as
+  // https://cdn.jsdelivr.net.example would satisfy a substring or an unanchored pattern.
+  const scriptSources = scriptSrc.split(/\s+/).slice(1);
   check('jsdelivr is allowed for scripts, and only jsdelivr',
-    scriptSrc.includes('https://cdn.jsdelivr.net') &&
-      !/https:\/\/(?!cdn\.jsdelivr\.net)/.test(scriptSrc), scriptSrc);
+    scriptSources.includes('https://cdn.jsdelivr.net') &&
+      scriptSources.every((s) => s === 'https://cdn.jsdelivr.net' || s.startsWith("'")), scriptSrc);
 
   // A 5xx is the response an attacker can most easily provoke; headers must survive it.
   const errRes = await fetch(`http://127.0.0.1:${port}/boom`);
