@@ -65,10 +65,11 @@ async function main(): Promise<void> {
   check("script-src carries no 'unsafe-eval'", !scriptSrc.includes("'unsafe-eval'"), scriptSrc);
   // Compared token by token, not by substring: a source such as
   // https://cdn.jsdelivr.net.example would satisfy a substring or an unanchored pattern.
+  const CDN_ORIGIN = 'https://cdn.jsdelivr.net';
   const scriptSources = scriptSrc.split(/\s+/).slice(1);
   check('jsdelivr is allowed for scripts, and only jsdelivr',
-    scriptSources.includes('https://cdn.jsdelivr.net') &&
-      scriptSources.every((s) => s === 'https://cdn.jsdelivr.net' || s.startsWith("'")), scriptSrc);
+    scriptSources.some((s) => s === CDN_ORIGIN) &&
+      scriptSources.every((s) => s === CDN_ORIGIN || s.startsWith("'")), scriptSrc);
 
   // A 5xx is the response an attacker can most easily provoke; headers must survive it.
   const errRes = await fetch(`http://127.0.0.1:${port}/boom`);
