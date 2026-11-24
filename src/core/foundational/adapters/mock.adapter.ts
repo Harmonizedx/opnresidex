@@ -6,6 +6,7 @@ import {
   ProviderConfig,
 } from '../types';
 import { identifierNamespace, tokenizeSubject } from '../util';
+import { requireSubjectPepper } from '../subject-pepper';
 
 /**
  * Deterministic mock foundational provider.
@@ -20,7 +21,7 @@ export class MockAdapter implements FoundationalProvider {
   readonly code = 'MOCK';
   private pepper: string;
   private authenticatesApplicant = false;
-  constructor(pepper = process.env.SUBJECT_PEPPER ?? 'dev-pepper') {
+  constructor(pepper = requireSubjectPepper()) {
     this.pepper = pepper;
   }
 

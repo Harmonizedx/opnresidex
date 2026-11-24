@@ -13,6 +13,7 @@ import {
 import { AssuranceLevel } from '../foundational/types';
 import { ApplicantBinding } from '../proofing/binding';
 import { tokenizeSubject } from '../foundational/util';
+import { requireSubjectPepper } from '../foundational/subject-pepper';
 
 /**
  * Signing in a resident at an EXTERNAL OpenID Provider.
@@ -250,7 +251,7 @@ export class UpstreamOidcClient {
   constructor(
     private cfg: UpstreamOidcConfig,
     private pending: PendingUpstreamAuthStore,
-    private pepper: string = process.env.SUBJECT_PEPPER ?? 'dev-pepper',
+    private pepper: string = requireSubjectPepper(),
     private fetchImpl: typeof fetch = fetch,
   ) {
     if (!cfg.acrMapping.length) {
