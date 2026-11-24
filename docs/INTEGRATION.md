@@ -92,7 +92,10 @@ The ID token / userinfo carries **only** these, and **never the national ID numb
 The citizen logs in once at the state IdP and **consents per service**; consent is a first-class,
 revocable record and is written to the tamper-evident audit log.
 
-### 4. Minimal callback (Node, `openid-client`)
+### 4. Minimal callback (Node, `openid-client` v5)
+
+This sample uses version 5 of the library (`npm install openid-client@5`). Version 6 replaced
+`Issuer` and `generators` with standalone functions, so the calls below do not exist there.
 
 ```js
 import { Issuer, generators } from 'openid-client';
@@ -160,7 +163,7 @@ moment a scholarship is awarded, not just at login.
 |---|---|
 | `POST /residency/verify` `{ credential, offline }` | Validate a VC-JWT: signature, expiry, revocation |
 | `GET /residency/{residentId}` | Non-sensitive registration details. Does **not** report revocation — use `POST /residency/verify` for credential liveness |
-| `GET /residency/{residentId}/relationship` | Whether the residency still holds: ORCS §4.3 status, validity and provenance ([ADR-0007](adr/0007-residency-status-is-lifecycle.md)) |
+| `GET /residency/{residentId}/relationship` | Whether the residency still holds: its status, validity and provenance ([ADR-0007](adr/0007-residency-status-is-lifecycle.md)) |
 
 With the typed SDK ([`SDK.md`](SDK.md)):
 

@@ -138,7 +138,7 @@ Add one file to `config/countries/`. Pick the source that matches the authority:
 | XML / SOAP API | `GENERIC_XML` | The service speaks SOAP/XML (common in government and X-Road stacks) | `xm-xml.yaml` |
 | Imported extract | `DATASET_FILE` / `IMPORT` | The authority hands over a CSV/JSON/YAML data dump, or the deployment is air-gapped | `xf-import.yaml` (+ `config/datasets/`) |
 
-All three are described declaratively and share one mapping layer, so the response-mapping and
+These three are described declaratively and share one mapping layer, so the response-mapping and
 success-flag dot-paths are written the same way regardless of source; XML simply addresses parsed
 elements, and a dataset addresses record fields. The config controls: which source, the
 endpoint/auth or dataset path, what the citizen submits, how the response maps to a normalized
@@ -353,7 +353,7 @@ This repository is the generic public infrastructure, not a single-country app:
 | Kubernetes deployment | raw manifests in `deploy/k8s` and a Helm chart in `deploy/helm` |
 | Operability | `/health/live`, `/health/ready` (asks the database); JSON operations log with identifier redaction; Prometheus metrics on `METRICS_PORT` — see `docs/DEPLOY.md` |
 | API specifications | OpenAPI 3.1 in `docs/openapi.yaml`, served at `/openapi.yaml` and `/docs` |
-| Developer documentation | `docs/ARCHITECTURE.md`, `docs/API.md`, `docs/DEPLOY.md`, `docs/SDK.md`, `docs/DPG.md` |
+| Developer documentation | Indexed in [`docs/README.md`](docs/README.md): architecture, API, deployment, integration, SDK, privacy, migration, MOSIP, interoperability, deployment governance, the DPG mapping and the decision records |
 
 ## Privacy and security posture
 
@@ -533,6 +533,13 @@ specification asked for it would be the project grading its own work. CI holds e
 recorded baseline and fails on any regression. These are internal criteria; they are not an external
 standard and no external conformance is claimed for them. The external standards the software
 builds on are the ones below.
+
+Twelve of the fourteen pass. Criterion 8 (versioned events) fails: there is no event
+registry or envelope, and the audit log is an internal integrity record, not a published event
+stream. Criterion 10 is partial: a refusal is recorded and appealable, but there is no route to
+a record for a person with no verifiable identifier
+([ADR-0016](docs/adr/0016-applicants-without-a-foundational-identifier.md)). `scripts/acceptance-baseline.json`
+records the verdict each criterion holds, and the build fails if one changes without it.
 
 **Checked in CI, on every pull request** (`npm run test:conformance`): the normative requirements
 of [VC Data Model 2.0](https://www.w3.org/TR/vc-data-model-2.0/),

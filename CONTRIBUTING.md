@@ -154,7 +154,7 @@ npm run start:dev
 
 ## Tests
 
-`npm test` runs everything CI runs. Each suite is a plain script — no test framework — and
+`npm test` runs the hermetic suites in sequence. Each suite is a plain script — no test framework — and
 prints one line per assertion, so a failure tells you what broke rather than where.
 
 | Command | What it covers |
@@ -163,7 +163,11 @@ prints one line per assertion, so a failure tells you what broke rather than whe
 | `npm run smoke` | The framework-agnostic core: config, adapters, credentials, consent, audit, offline |
 | `npm run smoke:oid4vci` | Drives issuance **as a wallet**, in both OpenID4VCI dialects, plus the attacks it must reject |
 | `npm run smoke:oid4vp` | Drives a presentation from both sides, plus the attacks it must reject |
+| `npm run smoke:<area>` | One area on its own: `consent`, `privacy`, `operator`, `identity-links`, `arrival-notice`, `delivery`, `access-log`, `compliance` and the rest. The full list is the `test` script in `package.json` |
 | `npm run test:conformance` | W3C VC Data Model 2.0, Bitstring Status List, and Data Integrity conformance |
+| `npm run acceptance` | The project's acceptance criteria, printed as PASS, PARTIAL or FAIL per criterion |
+| `npm run lint:arch`, `lint:licenses`, `lint:openapi` | The core imports no NestJS, every source file carries its licence header, and `docs/openapi.yaml` matches the routes the controllers declare |
+| `npm run test:sso-e2e`, `test:store-e2e` | The two suites that need PostgreSQL; `npm test` does not run them |
 
 CI runs all of these on every pull request, and builds the Docker image.
 

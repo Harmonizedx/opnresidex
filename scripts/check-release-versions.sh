@@ -37,6 +37,18 @@ sdk="$(node -p "require('./sdk/package.json').version")"
 [ "$lock_pkg" = "$want" ] || say "package-lock.json packages[\"\"].version is ${lock_pkg}, package.json is ${want}"
 [ "$sdk" = "$want" ] || say "sdk/package.json is ${sdk}, package.json is ${want}"
 
+# The places the version is written by hand for people who deploy: the API description, the
+# chart, and the image tags in the manifest and the deployment guide. These sat at 0.1.0
+# through two releases because nothing compared them.
+openapi="$(sed -n 's/^  version: //p' docs/openapi.yaml | head -1)"
+chart="$(sed -n 's/^appVersion: "\(.*\)"$/\1/p' deploy/helm/openresidency/Chart.yaml)"
+[ "$openapi" = "$want" ] || say "docs/openapi.yaml info.version is ${openapi}, package.json is ${want}"
+[ "$chart" = "$want" ] || say "deploy/helm/openresidency/Chart.yaml appVersion is ${chart}, package.json is ${want}"
+for f in deploy/k8s/app.yaml docs/DEPLOY.md; do
+  stale="$(grep -oE 'open-residency:v[0-9]+\.[0-9]+\.[0-9]+' "$f" | grep -vx "open-residency:v${want}" | sort -u | tr '\n' ' ' || true)"
+  [ -z "$stale" ] || say "${f} names ${stale}but package.json is ${want}"
+done
+
 if ! grep -qE "^## ${want//./\\.} — [0-9]{4}-[0-9]{2}-[0-9]{2}" CHANGELOG.md; then
   say "CHANGELOG.md has no '## ${want} — <date>' section"
 fi
@@ -49,4 +61,4 @@ if [ "$problems" -gt 0 ]; then
   echo "  and in sdk/), in the release-prep pull request, BEFORE the tag."
   exit 1
 fi
-echo "OK: package.json, package-lock.json, sdk/package.json and CHANGELOG.md all say ${want}${1:+, and so does the tag}"
+echo "OK: package.json, package-lock.json, sdk/package.json, CHANGELOG.md, the OpenAPI description, the chart and the image tags all say ${want}${1:+, and so does the tag}"

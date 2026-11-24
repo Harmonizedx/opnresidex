@@ -20,7 +20,7 @@ it. **Verify the digest before you run it** (the commands are in `SECURITY.md` a
 release page), and pin to the digest rather than the tag in anything that matters:
 
 ```bash
-docker pull ghcr.io/harmonizedx/open-residency:v0.1.0
+docker pull ghcr.io/harmonizedx/open-residency:v0.3.0
 ```
 
 To build locally instead:
@@ -82,7 +82,7 @@ helm install openres deploy/helm/openresidency \
 To reference an existing secret instead of chart-managed values, set
 `secrets.existingSecret=<name>`.
 
-The image defaults to the chart's `appVersion` (`v0.1.0` → `ghcr.io/harmonizedx/open-residency:v0.1.0`).
+The image defaults to the chart's `appVersion` (`v0.3.0` → `ghcr.io/harmonizedx/open-residency:v0.3.0`).
 Set `image.tag` to run a different release, or `image.digest=sha256:…` to pin the exact bytes
 named on the release page — a digest wins over a tag when both are set.
 
@@ -281,7 +281,6 @@ Revisit when a second service exists.
 - `CONTACT_ENCRYPTION_KEY` if `contactDirectory.mode: encrypted` (`openssl rand -hex 32`).
   Prefer `external` where a contact service already exists — then no recoverable phone
   number is stored here at all.
-- `USSD_GATEWAY_SECRET` if the USSD webhook is exposed.
 - The foundational provider secret named by each config's `foundational.auth.secretEnv`
   (e.g. `NIN_GATEWAY_KEY`). A missing one now fails at the point of use instead of
   sending an empty header and surfacing the gateway's 401 as an unexplained error.

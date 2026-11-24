@@ -9,36 +9,70 @@ persistence adapters.
 ## Layers
 
 ```
-                 +--------------------------------------------------+
-   HTTP / OIDC   |  NestJS controllers, guards, OIDC provider mount |
-                 +--------------------------------------------------+
+                 +---------------------------------------------------+
+   HTTP / OIDC   |  NestJS controllers, guards, OIDC provider mount  |  src/<module>/
+                 +---------------------------------------------------+
                                      |
-                 +--------------------------------------------------+
-   Core (no fw)  |  foundational | residency | credentials | offline|
-                 |  consent      | audit                            |
-                 +--------------------------------------------------+
+                 +---------------------------------------------------+
+   Core (no fw)  |  the modules under src/core/ (table below)        |  src/core/<module>/
+                 +---------------------------------------------------+
                                      |
-                 +--------------------------------------------------+
-   Ports         |  ResidencyStore | ConsentStore | AuditStore      |
-                 +--------------------------------------------------+
+                 +---------------------------------------------------+
+   Ports         |  ResidencyStore | ConsentStore | AuditStore | ... |
+                 +---------------------------------------------------+
                           |                         |
                  InMemory* (tests/pilots)    Prisma* (PostgreSQL)
 ```
 
-## Component map
+Nothing under `src/core/` imports NestJS or reaches back into the delivery layer;
+`npm run lint:arch` fails the build if it does. `src/platform/` is where the application
+composes the core: it loads the country configuration, builds the services and hands them to
+the controllers. The store ports are implemented in memory for tests and by the `Prisma*`
+classes in `src/prisma/prisma.service.ts` for PostgreSQL.
 
-| Concern | Core | Delivery |
+The diagrams in [ADR-0002](adr/0002-hexagonal-modular-architecture.md) show the same structure
+at four levels: system context, containers, the residency component, and the credential trust
+triangle.
+
+## Core modules
+
+All paths are under `src/core/`.
+
+| Module | What it holds | HTTP surface (under `src/`) |
 |---|---|---|
-| Identity Verification API | `foundational/*`, `residency/residency-service#getProvider` | `identity/identity.controller.ts` |
-| Resident Registry | `residency/ports.ts` | `prisma/prisma.service.ts`, `admin/admin.controller.ts` |
-| Residency Verification API | `credentials/vc-verifier.ts` | `residency/residency.controller.ts` |
-| State SSO | `sso/oidc.provider.ts` | `sso/oidc.module.ts`, `sso/interaction.controller.ts` |
-| Consent Framework | `consent/consent.ts` | `consent/consent.controller.ts` |
-| Audit Framework | `audit/audit-log.ts` | `audit/audit.controller.ts` |
-| API Gateway posture | `common/api-key.guard.ts`, throttler in `app.module.ts` | `deploy/k8s/ingress.yaml` |
-| Interoperability SDK | (client) | `sdk/` |
-| Reference UI | (client) | `public/` served at `/app` |
-| API specifications | `docs/openapi.yaml` | `meta/meta.controller.ts` (`/openapi.yaml`, `/docs`) |
+| `residency/` | The residency service and its four issuance gates, the relationship lifecycle, refusals, the Resident ID format, arrival notices, and the persistence port (`ports.ts`) | `residency/`, `federation/`, `admin/` |
+| `foundational/` | Adapters to identity sources (REST, XML, imported extract, NIN, Aadhaar, MOSIP ID Authentication, OpenID Provider, mock) and the mapping layer they share | `identity/` |
+| `proofing/` | Applicant binding, biometric comparison, and residence and address evidence | used by `residency/` and `upstream/` |
+| `identity/` | Identity links: which identifiers belong to which person | `residency/` |
+| `credentials/` | Issuing and verifying the credential in both formats (VC-JWT and Data Integrity), status lists, DID documents, signers and key custody, delivery records, federation trust | `residency/`, `vcapi/`, `credentials/` |
+| `oid4vci/` | Wallet issuance over OpenID4VCI | `oid4vci/` |
+| `oid4vp/` | Presentation requests and verification over OpenID4VP | `oid4vp/`, `vcapi/` |
+| `offline/` | QR encoding and the USSD menu | `offline/` |
+| `sso/` | Pairwise subjects, sign-in factors (credential, passkey, one-time code), sign-in assurance, and OIDC storage | `sso/` |
+| `oidc/` | Sign-in at an external OpenID Provider during enrolment | `upstream/` |
+| `consent/` | Consent records and receipts, and the Legal Basis Registry | `consent/` |
+| `audit/` | The hash-chained audit log and the resident's access log | `audit/`, `me/` |
+| `privacy/` | Erasure, retention, the compliance records and the breach register | `residency/`, `admin/` |
+| `statistics/` | Non-PII aggregates with small-cell suppression | `admin/` |
+| `assurance/` | The assurance registry and its profiles | `assurance/` |
+| `operator/` | Operator accounts, sessions, TOTP and federated staff sign-in | `operator/`, `common/operator.guard.ts` |
+| `messaging/` | The contact directory and one-time-code delivery through an SMS provider | wired in `platform/resident-messaging.ts` |
+| `ratelimit/` | The key a caller is rate-limited under | `common/caller-throttler.guard.ts` |
+| `config/` | The country configuration schema and ISO 3166-2 unit codes | loaded by `platform/platform.service.ts` |
+| `kernel/` | Branded types and secret handling shared by the other modules | none |
+
+Around the core, in the delivery layer and outside it:
+
+| Concern | Where |
+|---|---|
+| The OpenID Connect provider (`oidc-provider` mount) | `src/sso/oidc.provider.ts`, `src/sso/oidc.module.ts`, `src/sso/interaction.controller.ts` |
+| Persistence | `src/prisma/prisma.service.ts`, schema and migrations in `prisma/` |
+| Security headers, key custody wiring, background jobs | `src/platform/` |
+| Health, metrics and logging | `src/observability/` |
+| API specification | `docs/openapi.yaml`, served by `src/meta/meta.controller.ts` at `/openapi.yaml` and `/docs` |
+| Interoperability SDK | `sdk/` |
+| Reference UI | `public/`, served at `/app` |
+| Gateway posture | rate limiting in `src/common/`, ingress in `deploy/k8s/ingress.yaml` |
 
 ## Data flow: enroll to SSO
 
@@ -66,7 +100,9 @@ persistence adapters.
 ## Why these standards
 
 Ed25519 VC-JWT keeps credentials small enough for a single QR and paper carriage, and
-verifiable with one signature check offline. The Bitstring Status List lets verifiers
+verifiable with one signature check offline. The same credential is also issued as a
+JSON-LD Data Integrity credential (`eddsa-rdfc-2022`) for wallets that expect that format; see
+[`INTEROP.md`](INTEROP.md). The Bitstring Status List lets verifiers
 cache revocation and check it without a callback. OpenID Connect means any conformant
 relying party integrates without bespoke work. The audit log is hash-chained so it is
 tamper-evident, which is the property public-infrastructure oversight requires.

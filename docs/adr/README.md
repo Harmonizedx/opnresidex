@@ -1,12 +1,12 @@
 # Architecture Decision Records
 
-Material deviations and technology choices, one record each. ORRA-001 §15 requires an ADR for
+Material deviations and technology choices, one record each. The project requires a record for
 every one of them; these are the tracked, citable copies.
-
-Numbering starts at 0003 — PR #44 claims 0001 and 0002 for the hexagonal architecture.
 
 | ADR | Decision | Status |
 | --- | --- | --- |
+| [0001](0001-record-architecture-decisions.md) | Architecture decisions are recorded as numbered Markdown files in this folder, immutable once accepted and superseded rather than edited | Accepted |
+| [0002](0002-hexagonal-modular-architecture.md) | Hexagonal, modular architecture: bounded contexts in a framework-agnostic core, with ports and adapters around it | Accepted |
 | [0003](0003-orcs-normative-orra-advisory.md) | ORCS is normative, ORRA is advisory — disposition of the v7 consolidated spec | Accepted |
 | [0004](0004-one-deployment-one-jurisdiction.md) | One deployment, one jurisdiction: multiplicity lives in the ecosystem, `subjectRef @unique` stays | Accepted |
 | [0005](0005-enrolment-capture-layer.md) | Enrolment capture is a bounded, jurisdiction-declared layer; the credential stays minimal | Proposed |
@@ -21,8 +21,8 @@ Numbering starts at 0003 — PR #44 claims 0001 and 0002 for the hexagonal archi
 | [0014](0014-identity-links-are-a-record-not-a-column.md) | Which identifiers belong to which person is an append-only registry beside the record (LINK, DISPUTE, UNLINK, RELINK, MERGE, SPLIT), consulted by enrolment before `subjectRef`; a disputed link refuses issuance; unlinking the foundational identifier suspends first (ORCS §7); split restores identifiers, not relationships | Accepted |
 | [0015](0015-indigeneity-is-not-residency.md) | Indigeneity is not residency: the register holds no origin field in any form, a foundational origin never proves residence, and the credential states residence and nothing about belonging. Asserted by project criterion 14 | Accepted |
 | [0016](0016-applicants-without-a-foundational-identifier.md) | Applicants without a foundational identifier: proposes a counted referral that keeps the applicant's evidence now, and a jurisdiction-declared attested path for named classes later; rejects an attested-only credential by default | Proposed |
-| [0018](0018-arrival-notices-under-a-declared-exclusivity-rule.md) | Arrival notices under a declared exclusivity rule: the jurisdiction that registers a mover tells the one that issued the presented credential, with a signed notice naming the credential and nothing about the person; the receiving deployment's per-peer rule (`none`, `record`, `suspend`, `end`, with a grace period) decides locally; no register writes to another. Criterion 2 PASS | Accepted |
 | [0017](0017-the-specification-is-a-working-document.md) | The specification is a working document, not a published standard: the suite that asserts its criteria is the project's acceptance suite (`npm run acceptance`), public material cites decision records rather than its sections, and "conformance" is reserved for standards other people wrote | Accepted |
+| [0018](0018-arrival-notices-under-a-declared-exclusivity-rule.md) | Arrival notices under a declared exclusivity rule: the jurisdiction that registers a mover tells the one that issued the presented credential, with a signed notice naming the credential and nothing about the person; the receiving deployment's per-peer rule (`none`, `record`, `suspend`, `end`, with a grace period) decides locally; no register writes to another. Criterion 2 PASS | Accepted |
 
 ## Pending
 

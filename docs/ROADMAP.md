@@ -4,7 +4,7 @@ What is planned, what triggers it, and what is deliberately not planned. Dated s
 tell a stale entry from a current one. The acceptance suite (`npm run acceptance`) is the
 authoritative statement of what is done; this page is the statement of what is next.
 
-Updated 2026-10-06.
+Updated 2026-11-24.
 
 ## Planned, in order
 

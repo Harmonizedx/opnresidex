@@ -55,7 +55,7 @@ data is a conformance failure.
 
 ### Conformance is machine-checked
 
-ORCS §15's nine acceptance criteria are asserted by `scripts/orcs-conformance.ts`
+ORCS §15's nine acceptance criteria are asserted by `scripts/acceptance-criteria.ts`
 (`npm run conformance:orcs`). Conformance is what that suite reports, not what any document
 claims — including this one, which is why no pass/fail count is quoted here. Run the command.
 
@@ -87,7 +87,7 @@ by fall-through; where both are silent, the choice is ours and needs an ADR only
 
 ## Compliance
 
-- `scripts/orcs-conformance.ts` — the §15 gate.
+- `scripts/acceptance-criteria.ts` — the §15 gate.
 - Any pull request deviating from ORRA adds an ADR.
 - Any pull request that cannot satisfy ORCS states which criterion and why, in the commit
   message, rather than adjusting the criterion.

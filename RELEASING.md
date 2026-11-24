@@ -72,7 +72,7 @@ this one.
 2. **Regenerate the Prisma client first** if the schema has changed: `npx prisma generate`. A
    stale client produces dozens of misleading `Property does not exist on PrismaService` errors
    that look like broken code and are not.
-3. **Know the acceptance position.** Run `npm run acceptance`. All nine passing is
+3. **Know the acceptance position.** Run `npm run acceptance`. Every criterion passing is
    **not** a release requirement — an honest count is. The release workflow runs the suite
    against the tagged tree and ships the verbatim output as a signed asset
    (`ACCEPTANCE-CRITERIA.txt`) and in the release notes, so it cannot be pasted from the tracker
@@ -84,7 +84,10 @@ this one.
 7. **Version bumped** in `package.json`, `package-lock.json` and `sdk/package.json`, matching
    the tag: `npm version <x.y.z> --no-git-tag-version` at the root and again in `sdk/`.
    CI runs `npm run release:check` on every pull request, so the three files and the
-   CHANGELOG heading cannot drift apart on `main`.
+   CHANGELOG heading cannot drift apart on `main`. The same version is written by hand in
+   `docs/openapi.yaml` (`info.version`), the Helm chart's `appVersion`, and the image tags in
+   `deploy/k8s/app.yaml` and `docs/DEPLOY.md`; bump those in the same pull request. The
+   check covers them too.
 8. **The release-prep pull request is merged, and you are on it.** Then check, tag and push:
    ```bash
    git checkout main && git pull --ff-only
@@ -151,7 +154,7 @@ notice, and never in a patch.
 ## What a release does not claim
 
 - **Not a conformance certificate.** The acceptance criteria are the project's own, and a sample
-  of its specification rather than an audit of it. Say "all nine specification criteria pass"
+  of its specification rather than an audit of it. Say "every acceptance criterion passes"
   if they do; never "conformant" to the specification ([ADR-0017](docs/adr/0017-the-specification-is-a-working-document.md)).
 - **Not MOSIP certification, compliance or partnership.**
 - **Not a production endorsement.** The issuer key, the pepper, the aggregator contract and the

@@ -1,6 +1,6 @@
 # 2. Hexagonal, modular architecture (bounded contexts, ports & adapters)
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-30
 - Related: [ADR-0001](0001-record-architecture-decisions.md), [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md)
 - Supersedes: —

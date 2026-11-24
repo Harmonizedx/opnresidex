@@ -20,7 +20,7 @@ Both routes require an authenticated operator (`registrar`; `admin` satisfies it
 - `POST /residency/issue` — verify then issue a residency VC. Returns `issued`,
   `exists`, `challenge`, or `rejected`. A `rejected` result carries a `reference` and
   `appealPath` — the refusal is recorded, and the reference is what the applicant contests it
-  with. **Requires `x-admin-key`**: it accepts operator
+  with. **Requires an operator** (`registrar`): it accepts operator
   attestations (`binding`, `residenceEvidence`) that a self-serving caller must not be
   able to assert about themselves.
 - `GET /residency/{residentId}` — non-sensitive registration details: `residentId`,
@@ -33,24 +33,31 @@ Both routes require an authenticated operator (`registrar`; `admin` satisfies it
   whether the person still holds residency here.
 - `POST /residency/{residentId}/relationship/transition` `{ status, reason }` — end, suspend or
   reinstate a residency. A terminal transition requires a reason, and the deciding
-  operator is recorded. **Requires `x-admin-key`** (`revoker`). Deliberately does not revoke the
+  operator is recorded. **Requires an operator** (`revoker`). Deliberately does not revoke the
   credential: see [ADR-0007](adr/0007-residency-status-is-lifecycle.md).
 - `POST /residency/verify` — verify a presented VC-JWT (signature, expiry, revocation).
 - `POST /residency/revoke/{residentId}` — revoke a credential, recording the jurisdiction's
-  configured reason and appeal path. **Requires `x-admin-key`.**
+  configured reason and appeal path. **Requires an operator** (`revoker`).
 - `POST /residency/refusals/{reference}/review` `{ status, note }` — record that a person
   reconsidered a refusal the software took. `overturned` is a real outcome, not a courtesy: the
   reviewer must be able to reach a different answer (NDPA 2023 s.37, GDPR Art.22, Convention
-  108+). **Requires `x-admin-key`** (`registrar`).
+  108+). **Requires an operator** (`registrar`).
 - `GET /residency/refusals/{reference}` — why an application was refused, by whom, and how to
   appeal. Looked up by the applicant's reference, never by name or number, so refusals cannot
-  be enumerated. **Requires `x-admin-key`** (`registrar`).
+  be enumerated. **Requires an operator** (`registrar`).
 - `GET /residency/{residentId}/credential` — the credential's lifecycle status: why it was
   revoked or suspended, by whom, when, and how the holder appeals.
 - `POST /residency/{residentId}/credential/transition` `{ status, reason, appealPath,
   supersededBy }` — suspend, reinstate, revoke or replace a credential. A revocation missing a
-  reason, authority or appeal path is **refused**, not recorded blank. **Requires
-  `x-admin-key`** (`revoker`).
+  reason, authority or appeal path is **refused**, not recorded blank. **Requires an
+  operator** (`revoker`).
+- `POST /residency/{residentId}/credential/deliveries` — record that a credential was handed
+  over, collected, dispatched or failed to arrive. One event per attempt, appended and never
+  edited; `failed` requires a `failureReason`. Where the jurisdiction sets
+  `credential.activateOn: first_delivery`, the first `delivered` or `collected` event activates
+  the credential. Operator action (`registrar`).
+- `GET /residency/{residentId}/credential/deliveries` — every delivery event recorded for a
+  resident. Operator action (`support`).
 - `POST /residency/{residentId}/reconcile` — re-check a resident against the foundational
   source and record the outcome (`confirmed`, `already-confirmed`, `unconfirmed`, `mismatch`,
   `unknown`). Operator action (`registrar`).
@@ -165,7 +172,7 @@ platform and must not be redeclared.
   refused without one; the authority recorded is the authenticated operator, never a body
   value. There is no reactivation: a basis relied on again
   is a new entry with its own version, so the gap during which processing was unauthorised
-  stays visible. **Requires `x-admin-key`** (`admin`).
+  stays visible. **Requires an operator** (`admin`).
 
 Withdrawing a basis stops every consent citing it. Consent expiry or withdrawal stops
 processing **unless another valid legal basis applies** — a statutory basis survives the
@@ -189,6 +196,12 @@ citizen's consent lapsing, which is why the two are recorded separately.
 - `GET /audit/verify` — confirm the hash chain is intact.
 - `GET /admin/residents` — list registry entries.
 - `GET /admin/stats` — counts by country.
+- `GET /admin/compliance/ropa` — the record of processing activities, generated from the live
+  configuration as a skeleton with every unknown listed (`admin`).
+- `GET /admin/compliance/dpia` — the facts an impact assessment starts from, and which
+  triggers apply (`admin`).
+- `GET|POST /admin/compliance/breaches` — read the breach register, and enter a breach in it.
+  Append-only; the notification deadline is computed from `detectedAt` and returned (`admin`).
 
 ## Non-PII data extraction
 
@@ -222,6 +235,49 @@ release as needing its own disclosure review.
   `USSD_GATEWAY_SECRET`** as `x-ussd-secret`: the handler trusts the caller's word for
   `phoneNumber`, so only the aggregator may call it.
 
+## Enrolment through an external OpenID Provider
+
+For a jurisdiction whose identity source is an OpenID Provider (`upstreamOidc` in the country
+config). Both routes answer 503 where no profile is declared.
+
+- `POST /enrolment/upstream/start` — returns the authorization URL to send the applicant to,
+  and the `state` that identifies the request. Operator action (`registrar`).
+- `GET /enrolment/upstream/callback` — the redirect target registered with the provider.
+  Unauthenticated, because the applicant's browser arrives here; `state` is required and
+  single-use.
+
+## Wallet issuance: OpenID4VCI
+
+An enrolment desk creates an offer; the resident's wallet redeems it. Only the offer needs an
+operator. The other three are wallet-facing and unauthenticated.
+
+- `POST /openid4vci/offer` — create a Credential Offer for an enrolled resident. Returns an
+  `openid-credential-offer://` link to render as a QR and a transaction code to read out.
+  Operator action (`registrar`).
+- `POST /openid4vci/token` — exchange the pre-authorized code and the transaction code for an
+  access token. The code is single-use and wrong transaction codes are counted.
+- `POST /openid4vci/nonce` — a fresh, single-use `c_nonce` for the wallet to sign over.
+- `POST /openid4vci/credential` — issue the credential, bound to the key the wallet proves
+  possession of. A key proof is required; an unbound credential is never issued.
+
+## Resident self-service: the access log
+
+A resident reads who has looked at their record. No operator is involved; the resident proves
+themselves with one of the factors the jurisdiction accepts
+(`selfService.accessLogFactors`), and a factor that is switched off answers 403.
+
+- `GET /me/access-log/factors` — which factors this deployment accepts: `presentation`,
+  `ussd`, `otp`.
+- `POST /me/access-log/presentation/start` — begin by presenting the residency credential.
+  Returns an OpenID4VP request URI and a QR of it for the resident's wallet.
+- `GET /me/access-log/presentation` — reports `status` until the wallet has presented, then
+  the entries.
+- `POST /me/access-log/start` — send a one-time code to the contact the register holds.
+  Answers `{ sent: true }` whether or not the residency id exists.
+- `POST /me/access-log` — the entries, given the code: every disclosure of the record, oldest
+  first, with staff reduced to a kind and relying parties named by client identifier. Reading
+  it is itself recorded.
+
 ## Presentation: OpenID4VP
 
 A relying party asks a wallet to present the residency credential. Creating and reading a
@@ -252,6 +308,8 @@ The standard issuer and verifier interfaces, used by the W3C conformance suites.
   `-suspension`), for offline revocation checks.
 - `GET /.well-known/openid-credential-issuer`, `GET /.well-known/oauth-authorization-server` —
   OpenID4VCI issuer and authorization-server metadata.
+- `GET /contexts/residency/v1` — the residency JSON-LD context, published so an external
+  verifier can dereference it.
 - `GET /openapi.yaml`, `GET /docs` — this API's OpenAPI 3.1 spec and Swagger UI.
 
 ## SSO
@@ -315,7 +373,7 @@ Set by `operatorAuth.mode` in the country config:
 | Role | Grants |
 |---|---|
 | `registrar` | identity verification, residency issuance, credential offers, VC-API issuance |
-| `revoker` | residency revocation |
+| `revoker` | residency revocation, relationship and credential status transitions, unlinking and relinking identity links, resolving arrival notices |
 | `auditor` | the audit log and its chain verification |
 | `support` | registry reads, consent administration, presentation requests |
 | `admin` | everything, plus operator and key management |
