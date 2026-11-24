@@ -4,10 +4,10 @@
 
 Please do not open a public issue for security vulnerabilities.
 
-Report privately through the security contact published on the HarmonizedX website, or
-by opening a GitHub security advisory on this repository. Include a description, steps
-to reproduce, and the impact you observed. We aim to acknowledge reports within a few
-business days.
+Report privately by email to the lead maintainer named in [`GOVERNANCE.md`](GOVERNANCE.md),
+or by opening a GitHub security advisory on this repository (Security, then "Report a
+vulnerability"). Include a description, steps to reproduce, and the impact you observed. We
+acknowledge reports within 5 business days.
 
 ## Scope and sensitive areas
 

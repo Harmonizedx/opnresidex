@@ -3,7 +3,7 @@
 ## Ownership
 
 OpenResidency is owned and stewarded by **HarmonizedX Limited** (RC 2011004, Abuja,
-Nigeria). HarmonizedX holds the copyright on the project's original work and is
+Nigeria; <https://harmonizedx.ng>). HarmonizedX holds the copyright on the project's original work and is
 responsible for its direction, releases, and its listing as a Digital Public Good.
 
 The software is licensed to everyone under Apache-2.0. Ownership of the project (the
@@ -19,7 +19,6 @@ cut releases, and triage security reports.
 - **Chinonso Williams** (<nonso@harmonizedx.com>) — original author and lead maintainer.
   Created OpenResidency before it was handed to HarmonizedX for stewardship.
 - HarmonizedX Limited (engineering) — maintainer team.
-- Add individual maintainers here as the community grows.
 
 ## How decisions are made
 
@@ -42,5 +41,5 @@ See `SECURITY.md` for how to report vulnerabilities.
 
 ## Contact
 
-Open an issue for anything public. For private matters (security, governance), use the
-contact channel published on the HarmonizedX website.
+Open an issue for anything public. For private governance matters, email the lead maintainer
+named under [Maintainers](#maintainers). For security reports, follow `SECURITY.md`.

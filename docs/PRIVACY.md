@@ -9,7 +9,7 @@ retention periods and disclosure policy. What follows describes what the softwar
 controller can write their own notice on top of it without reverse-engineering the code.
 
 Written against the six privacy requirements the Digital Public Goods Alliance added to the
-DPG Standard in 2024, and ORCS §14.
+DPG Standard in 2024.
 
 ## 1. What is collected, and what is deliberately not
 
@@ -20,6 +20,17 @@ DPG Standard in 2024, and ORCS §14.
 | Minimized demographics | Name, date of birth, gender — only what the credential asserts. |
 | Jurisdiction, assurance, binding method, residence evidence level | The decision inputs, so a determination can be explained. |
 | Phone number | Only when `contactDirectory.mode` is `encrypted`: AES-256-GCM ciphertext under a key held outside the database, plus a one-way hash for matching. Under `external` or `none`, only the hash. |
+| Residence address | Only where the jurisdiction anchors residency on an address ([ADR-0011](adr/0011-residency-anchor-is-a-jurisdiction-choice.md)). Otherwise the administrative unit alone. |
+| Residence mode and attester type | Where a jurisdiction admits registration without a fixed address: which mode was used and what kind of attester vouched. |
+| Refusal records | For an application that was refused: the reference handed to the applicant, the reason, the operators who took and decided it, and any review outcome. Carries the tokenized `subjectRef` only where an identity was established, and no name. |
+| Identity links | Which identifiers belong to the person: the identifier type and a reference to it (the foundational identifier is tokenized, never the number), evidence references, and who linked, disputed or unlinked it. |
+| Consent records | Relying party, purpose, scopes, data categories, legal basis and the evidence of agreement. |
+| Credential delivery events | Channel, outcome, time and the recording operator. |
+| Passkeys | Where a resident enrols one: the credential id, public key and signature counter. No biometric leaves the resident's device. |
+| One-time codes | A hash of the code and its expiry, never the code. |
+| Arrival notices | For a resident who moves between federated jurisdictions: the peer's identifier, the credential id and a hash of the presentation. |
+| Operator accounts | About staff, not residents: email, display name and roles; under `operatorAuth.mode: local` also a password hash and TOTP secret. API keys are stored as hashes. |
+| Breach register | Entries a controller records after a breach: categories of data, a description and the number of people affected. |
 
 **Never held:** the raw national identification number. It reaches the foundational adapter,
 is tokenized, and does not survive the call. It is never stored, never logged, never returned
@@ -45,7 +56,9 @@ converges to `expired` rather than sitting `active` while behaving otherwise. Wi
 revokes the OIDC grant it authorised, so tokens already issued stop releasing claims.
 
 Consent is one lawful basis among several. Where a deployment processes under statutory
-authority instead, that is a different basis and must be recorded as such — see the gap in §8.
+authority instead, that is a different basis and must be recorded as such: declare it under
+`dataProtection.legalBases`, so it resolves through the Legal Basis Registry
+([ADR-0009](adr/0009-legal-basis-registry-closed-vocabulary.md)).
 
 ## 4. Erasure
 
@@ -133,6 +146,9 @@ is why the redaction record names them.
 | Right | Mechanism |
 | --- | --- |
 | Access | `GET /consent/resident/{residentId}`, `GET /residency/{residentId}` |
+| Know who accessed the record | `POST /me/access-log`, after the resident proves themselves with their credential, a USSD session or a one-time code. Staff are reduced to a kind; relying parties are named. |
+| Human review of a refusal | `GET /residency/refusals/{reference}` for the reason and appeal path; `POST /residency/refusals/{reference}/review` records the reviewer's outcome, which may overturn it |
+| Rectification of linked identifiers | The dispute, unlink and relink routes under identity links (`docs/API.md`) |
 | Portability | Consent receipts are signed, portable JWTs the citizen holds; the credential itself is a portable W3C VC |
 | Erasure | `POST /residency/{residentId}/erase` |
 | Withdraw consent | `POST /consent/{id}/revoke` — blocks future consent-dependent disclosure and revokes the associated OIDC grant |

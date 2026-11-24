@@ -3,7 +3,7 @@ name: openresidency
 description: Open-source subnational trust infrastructure for verified, purpose-scoped jurisdictional relationships between residents and their jurisdictions (DPG).
 type: application
 version: 0.1.0
-appVersion: "0.1.0"
+appVersion: "0.3.0"
 home: https://github.com/Harmonizedx/open-residency
 sources:
   - https://github.com/Harmonizedx/open-residency

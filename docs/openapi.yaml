@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: OpenResidency API
-  version: 0.1.0
+  version: 0.3.0
   description: >
     Open-source subnational trust infrastructure for verified, purpose-scoped jurisdictional
     relationships between residents and their jurisdictions, giving citizens inclusive,
@@ -27,7 +27,7 @@ tags:
   - name: admin
     description: Resident registry administration (admin)
   - name: me
-    description: What a resident can see about their own record, proved by a one-time code to the registered contact
+    description: What a resident can see about their own record, proved by presenting their own credential, by a USSD session from the registered SIM, or by a one-time code to the registered contact
   - name: statistics
     description: >
       Aggregate, non-PII residency statistics in JSON and RFC 4180 CSV. This is the

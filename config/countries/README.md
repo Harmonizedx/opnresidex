@@ -1,7 +1,7 @@
 # Country configurations
 
 Each YAML file here onboards one jurisdiction. No code change is required for a country
-whose foundational identity provider is a normal REST API.
+whose foundational identity source is a REST or XML/SOAP API, or an imported extract.
 
 Four questions are answered declaratively:
 
@@ -16,7 +16,7 @@ Three optional blocks tune interoperability and sign-in:
 6. How are presentations requested? (`presentation`)
 7. Which sector services can citizens sign into with their residency? (`oidc`)
 
-Both default to the widest interoperable behaviour, so **omitting them is safe** — that is
+`wallet` and `presentation` default to the widest interoperable behaviour, so **omitting them is safe** — that is
 what `ng.yaml`, `in.yaml`, and `ke.yaml` do. `demo.yaml` spells every knob out with the
 reasoning attached. See [`docs/INTEROP.md`](../../docs/INTEROP.md) for what each one costs.
 

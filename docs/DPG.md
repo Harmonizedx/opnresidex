@@ -11,13 +11,15 @@ apart, and a reviewer reads both.
 
 ## Open standards used
 
-- **W3C Verifiable Credentials** for the residency credential (VC-JWT profile).
-- **W3C Decentralized Identifiers** (`did:web` for government issuers, `did:key` for fully
+- **[W3C Verifiable Credentials Data Model 2.0](https://www.w3.org/TR/vc-data-model-2.0/)** for
+  the residency credential, issued in two formats with identical claims: VC-JWT, and
+  [Data Integrity with `eddsa-rdfc-2022`](https://www.w3.org/TR/vc-di-eddsa/).
+- **[W3C Decentralized Identifiers](https://www.w3.org/TR/did-core/)** (`did:web` for government issuers, `did:key` for fully
   offline verification).
-- **W3C Bitstring Status List** for cacheable, offline-checkable revocation.
-- **OpenID Connect / OAuth 2.0** for cross-sector single sign-on.
-- **OpenID4VCI / OpenID4VP** for wallet-based issuance and presentation.
-- **EdDSA / Ed25519** for compact signatures suitable for QR and paper carriage.
+- **[W3C Bitstring Status List](https://www.w3.org/TR/vc-bitstring-status-list/)** for cacheable, offline-checkable revocation.
+- **[OpenID Connect](https://openid.net/specs/openid-connect-core-1_0.html) / [OAuth 2.0](https://www.rfc-editor.org/rfc/rfc6749)** for cross-sector single sign-on.
+- **[OpenID4VCI](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0.html) / [OpenID4VP](https://openid.net/specs/openid-4-verifiable-presentations-1_0.html)** for wallet-based issuance and presentation.
+- **[EdDSA / Ed25519](https://www.rfc-editor.org/rfc/rfc8032)** for compact signatures suitable for QR and paper carriage.
 
 Building on these open standards is deliberate: it keeps OpenResidency interoperable with any
 conformant wallet, verifier, or relying party, and avoids a proprietary lock-in that would
@@ -43,8 +45,10 @@ Apache-2.0, an OSI-approved licence. Evidence: `LICENSE`, `NOTICE`.
 
 ### 3. Clear ownership
 
-Owned and stewarded by HarmonizedX Limited (RC 2011004, Abuja, Nigeria). Copyright is recorded
-in `NOTICE`; ownership and maintainership in `GOVERNANCE.md`.
+Owned and stewarded by HarmonizedX Limited (RC 2011004, Abuja, Nigeria;
+<https://harmonizedx.ng>). Copyright is recorded in `NOTICE`; ownership and maintainership in
+`GOVERNANCE.md`. The project was created by an individual, who is named as author in
+`package.json` and as lead maintainer; the company holds the copyright.
 
 ### 4. Platform independence
 
@@ -52,7 +56,29 @@ No mandatory closed-source dependency. Runtime is Node.js; PostgreSQL sits behin
 `ResidencyStore` port; the core domain logic has no framework dependency and runs unchanged in
 the hermetic CI suites and against a real database.
 
-Evidence: `src/core/*`, `src/core/residency/ports.ts`, `src/prisma/prisma.service.ts`.
+What it runs on, all under open licences:
+
+| Component | Role | Licence |
+| --- | --- | --- |
+| Node.js 22 or later | Runtime | MIT |
+| PostgreSQL 16 | Database | PostgreSQL Licence |
+| NestJS | HTTP delivery layer | MIT |
+| Prisma | Database client and migrations | Apache-2.0 |
+| `oidc-provider` | OpenID Connect provider | MIT |
+| `jose` | JWT signing and verification | MIT |
+| Express | HTTP server under NestJS | MIT |
+
+Closed services are optional, and each has an open route beside it:
+
+| Optional service | What it is for | Open alternative |
+| --- | --- | --- |
+| AWS KMS or Google Cloud KMS | Hardware custody of the issuer key | Any HSM over PKCS#11 (`pkcs11js`, MIT), or a software key |
+| Africa's Talking, Termii or Twilio | SMS delivery of one-time codes | `GENERIC_HTTP`, which calls any aggregator with a REST endpoint; SMS can also be left off |
+
+The cloud KMS signers call those services over HTTP; no vendor SDK is a dependency.
+
+Evidence: `package.json`, `src/core/*`, `src/core/residency/ports.ts`,
+`src/core/credentials/signers/`, `src/prisma/prisma.service.ts`.
 
 ### 5. Documentation
 
@@ -60,8 +86,13 @@ README (architecture, quickstart, onboarding), an architecture document, an API 
 OpenAPI 3.1 specification served by the running app, SDK and integration guides, a deployment
 guide, and runnable smoke tests that double as executable documentation.
 
-Evidence: `README.md`, `docs/ARCHITECTURE.md`, `docs/API.md`, `docs/openapi.yaml`,
-`docs/SDK.md`, `docs/INTEGRATION.md`, `docs/DEPLOY.md`, `scripts/smoke.ts`.
+Privacy, migration, deployment governance, MOSIP and first-credential guides sit beside them,
+with a decision record for each material choice. [`docs/README.md`](README.md) indexes all of
+it.
+
+Evidence: `README.md`, `docs/README.md`, `docs/ARCHITECTURE.md`, `docs/API.md`,
+`docs/openapi.yaml`, `docs/SDK.md`, `docs/INTEGRATION.md`, `docs/DEPLOY.md`, `docs/PRIVACY.md`,
+`docs/adr/`, `scripts/smoke.ts`.
 
 ### 6. Mechanism for extracting data and content
 
@@ -79,7 +110,7 @@ user-generated content (indicator 9b):
   the absence of personal data is a property of the types rather than of reviewer diligence.
   Small cells are suppressed (see below).
 - **Published trust artifacts.** The issuer DID document (`GET /.well-known/did.json`) and the
-  Bitstring Status List (`GET /.well-known/status/{cc}.json`) are public JSON/JSON-LD by
+  Bitstring Status List (`GET /.well-known/status/{file}`) are public JSON/JSON-LD by
   design, and contain no personal data — revocation is an index into a bitstring, not a name.
 - **Schema and vocabulary.** The OpenAPI 3.1 specification (`GET /openapi.yaml`) and the
   residency JSON-LD context (`GET /contexts/residency/v1`) are open, machine-readable, and
@@ -112,7 +143,7 @@ landed):
 
 | Requirement | Status |
 | --- | --- |
-| Data minimisation | **Met.** Raw national IDs are never stored; only an HMAC-tokenised `subjectRef` is persisted. The national ID is never shared with relying parties. Phone numbers are stored encrypted, off the residency port, so the core service cannot reach them. |
+| Data minimisation | **Met.** Raw national IDs are never stored; only an HMAC-tokenised `subjectRef` is persisted. The national ID is never shared with relying parties. A phone number is stored only where the jurisdiction sets `contactDirectory.mode: encrypted`, as ciphertext off the residency port, so the core service cannot reach it; in every other mode only a one-way hash is kept. |
 | User consent mechanisms | **Met.** First-class, revocable consent records with signed, portable receipts, plus per-client OIDC consent. Each grant states the attributes [ADR-0009](adr/0009-legal-basis-registry-closed-vocabulary.md) requires — controller, processor, data categories, evidence of agreement — and its `legalBasisReference` resolves through the Legal Basis Registry: an unregistered reference is refused rather than stored, and a grant missing data categories or evidence is refused rather than written blank. Withdrawing a basis stops processing under it, while the repealed entry stays readable. |
 | Data usage transparency | **Met.** `docs/PRIVACY.md` states what is collected, what is deliberately not, who receives it, and the known gaps. |
 | Privacy by design (PII deletion) | **Met.** `POST /residency/{id}/erase` destroys every identifying field and redacts the subject from the audit log. The credential is revoked first, so what the citizen holds is dead before its subject becomes unidentifiable. |
@@ -200,6 +231,13 @@ The project's own acceptance suite (`npm run acceptance`) is the open test suite
 indicator asks for as evidence: fourteen criteria, each printing the external requirement it
 serves beside its verdict, held in CI at a recorded baseline that fails on regression. It is
 the project's own, not an external standard, and `README.md` says so where it describes it.
+
+Twelve of the fourteen pass. Criterion 8 (versioned events) fails: there is no event
+registry or envelope, and the audit log is an internal integrity record, not a published event
+stream. Criterion 10 is partial: a refusal is recorded and appealable, but there is no route to
+a record for a person with no verifiable identifier
+([ADR-0016](adr/0016-applicants-without-a-foundational-identifier.md)). `scripts/acceptance-baseline.json`
+records the verdict each criterion holds, and the build fails if one changes without it.
 
 **Stated plainly:** the dependency audit gate fails the build at *moderate* severity on
 runtime dependencies, and the image scan fails it at *high* on fixable findings in the
@@ -318,24 +356,6 @@ mitigations there; the other two sub-indicators the form asks separately:
 
 Repeat the "Honest caveats" section verbatim in the submission rather than smoothing it over.
 
-## Indicators 7 and 8: previously open, now landed
-
-Earlier drafts flagged these two as incomplete. Both are now implemented and evidenced in the
-sections above — answer the form from those sections, not from the old caveat:
-
-- **Indicator 7.** Erasure is implemented (`POST /residency/{id}/erase`), with audit redaction
-  that keeps the tamper-evident chain verifiable. Retention is implemented too —
-  per-jurisdiction periods and an operator-run sweep that is dry-run by default. All six
-  privacy requirements are met. State the two real limits rather than omitting them: the sweep
-  covers residency records only, and nothing schedules it.
-- **Indicator 8.** Dependency scanning (Dependabot), a CycloneDX SBOM, and CodeQL static
-  analysis all run in CI. The audit gate fails the build at *moderate* on runtime
-  dependencies, and the image scan at *high* on fixable findings. Report the audit's position
-  at submission time by running it (`npm audit --omit=dev --audit-level=moderate`) rather
-  than copying a count from this page. Releases ship a
-  signed SBOM and a signed, attested container image, so the supply-chain claim covers the
-  artifact a government actually runs, not only the source.
-
 ## Attachments to reference
 
 - Repository URL (public)
@@ -359,9 +379,9 @@ sections above — answer the form from those sections, not from the old caveat:
       in the README's front-door table is the first thing a reviewer clicks. Every `docs/` link
       in the repository now resolves.
 - [x] This document re-read end to end, so every claim still matches the code. Verified
-      2026-08-13 against `main`: every cited path resolves, every claimed endpoint is a real
-      route, indicator 6's suppression numbers match `aggregate.ts`, indicator 8's CI list
-      matches the workflows, and indicator 9's mechanisms all exist. One drift found and
-      fixed (the audit-verify response gained a `redacted` field the spec did not document).
-      Re-run this pass before any later submission — five claim-level drifts were found this
-      cycle, and none of them was catchable by a test.
+      2026-11-24 against `main`: every cited path resolves, every claimed endpoint is in the
+      OpenAPI description (which the build holds to the controllers), indicator 6's
+      suppression threshold matches `aggregate.ts`, indicator 8's CI list matches the
+      workflow, and the acceptance position quoted under indicator 8 is what
+      `npm run acceptance` printed that day. Re-run this pass before any later submission;
+      claim-level drift is not catchable by a test.

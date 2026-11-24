@@ -77,6 +77,11 @@ national_id,first_name,last_name,dob,sex,residence_state,origin_state,phone
 23456789012,Amina,Bello,1991-03-14,F,Katsina,Kano,+2348030000001
 ```
 
+The `origin_state` column is there because real extracts carry one. The mapping names it so
+that it is never mistaken for residence; it is not stored on the residency record and not
+stated in the credential
+([ADR-0015](adr/0015-indigeneity-is-not-residency.md)).
+
 Copy both, rename the country, and edit the mapping to your columns:
 
 ```bash
@@ -149,6 +154,9 @@ const issued = await jurisdiction.issueResidency({
   binding: { method: 'attended_comparison', ref: 'desk:KT-01:operator-7' },
 });
 ```
+
+`adminKey` is the SDK's option for the shared `ADMIN_API_KEY` this walkthrough uses, and is
+marked deprecated. Once operators have their own keys, pass `operatorKey` instead.
 
 A wrong surname is refused, not errored, and the applicant gets a reference to contest it
 with:

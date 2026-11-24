@@ -87,7 +87,7 @@ only ensures the register cannot be used to settle it by other means, in either 
 
 ## How this is verified
 
-Project acceptance criterion 14 in `scripts/orcs-conformance.ts` issues against a mock
+Project acceptance criterion 14 in `scripts/acceptance-criteria.ts` issues against a mock
 foundational record whose origin matches the claimed unit while its residence does not, and
 asserts the refusal; issues the reverse and asserts success; decodes the credential and
 serialises the record and asserts that neither contains a key naming origin or indigeneity; and

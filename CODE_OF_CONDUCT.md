@@ -64,8 +64,8 @@ the community in public spaces.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behaviour may be reported to the
-maintainers privately, through the contact channel published on the HarmonizedX website. See
-`GOVERNANCE.md` for who maintains this project.
+maintainers privately, by email to the lead maintainer named in
+[`GOVERNANCE.md`](GOVERNANCE.md).
 
 All complaints will be reviewed and investigated promptly and fairly. All maintainers are
 obliged to respect the privacy and security of the reporter of any incident.

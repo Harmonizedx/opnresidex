@@ -6,7 +6,7 @@ recurring policy: versioning, what a release contains, and the per-release check
 ## 1. The public repository
 
 `https://github.com/Harmonizedx/open-residency` is public. CI (`.github/workflows/ci.yml`)
-runs on pull request and on push to `main`: typecheck, the smoke suites, the ORCS §15
+runs on pull request and on push to `main`: typecheck, the smoke suites, the acceptance-criteria
 ratchet, and a Docker image build and scan. The W3C suite needs a running server and stays
 opt-in (`npm run test:w3c`). A tag push runs `release.yml`, which
 attaches the signed SBOM, source archive and conformance record to the GitHub release and
