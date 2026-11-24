@@ -1,7 +1,8 @@
 # @openresidency/sdk
 
-Millions of people cannot prove where they live, and lose access to services because of it.
-[OpenResidency](https://github.com/Harmonizedx/open-residency) is open-source trust
+Having a national ID is not the same as being able to prove where you live, and public services
+are delivered where you live.
+[OpnResidex](https://github.com/Harmonizedx/opnresidex) is open-source trust
 infrastructure a state, province or county runs so that its residents can: it verifies a
 person against the national ID, gives them a W3C Verifiable Credential that proves their
 relationship with the jurisdiction, and lets every service (health, education, tax, social
@@ -14,12 +15,12 @@ This package is the typed client for one such instance. It is dependency-free, u
 global `fetch` (Node 18+ or any browser), and every operation the server exposes is
 reachable with its request and response types.
 
-- API reference: [`docs/API.md`](https://github.com/Harmonizedx/open-residency/blob/main/docs/API.md)
+- API reference: [`docs/API.md`](https://github.com/Harmonizedx/opnresidex/blob/main/docs/API.md)
   and the OpenAPI 3.1 description every instance serves at `/openapi.yaml` and `/docs`.
-- Integrating a service: [`docs/INTEGRATION.md`](https://github.com/Harmonizedx/open-residency/blob/main/docs/INTEGRATION.md).
-- Wallets and standards: [`docs/INTEROP.md`](https://github.com/Harmonizedx/open-residency/blob/main/docs/INTEROP.md).
+- Integrating a service: [`docs/INTEGRATION.md`](https://github.com/Harmonizedx/opnresidex/blob/main/docs/INTEGRATION.md).
+- Wallets and standards: [`docs/INTEROP.md`](https://github.com/Harmonizedx/opnresidex/blob/main/docs/INTEROP.md).
 - Design decisions behind each surface are recorded as ADRs in
-  [`docs/adr/`](https://github.com/Harmonizedx/open-residency/tree/main/docs/adr); the table
+  [`docs/adr/`](https://github.com/Harmonizedx/opnresidex/tree/main/docs/adr); the table
   below links the relevant one per area.
 
 ```bash
@@ -47,16 +48,17 @@ has to be a national system to start:
   anonymous actor. Per-operator keys come from `POST /operator/keys` when you are ready.
 
 Every step, run as written against a real database:
-[docs/FIRST-RESIDENCY.md](https://github.com/Harmonizedx/open-residency/blob/main/docs/FIRST-RESIDENCY.md).
-Operating it beyond a pilot: [docs/DEPLOY.md](https://github.com/Harmonizedx/open-residency/blob/main/docs/DEPLOY.md).
+[docs/FIRST-RESIDENCY.md](https://github.com/Harmonizedx/opnresidex/blob/main/docs/FIRST-RESIDENCY.md).
+Operating it beyond a pilot: [docs/DEPLOY.md](https://github.com/Harmonizedx/opnresidex/blob/main/docs/DEPLOY.md).
 
 ## Which one are you?
 
 ### A service checking whether someone is a resident
 
-A clinic, a school, a bank, a subsidy desk. The citizen presents their credential (a QR code,
+A clinic, a school, a bank, a subsidy desk. The person presents their credential (a QR code,
 a wallet, a pasted token) and you ask the jurisdiction's instance whether it holds. No
-credential of your own is needed.
+credential of your own is needed. `id.katsina.gov.ng` in the examples below is a placeholder,
+not a live deployment.
 
 ```ts
 import { OpenResidencyClient } from '@openresidency/sdk';
@@ -127,7 +129,7 @@ protocol steps: `credentialIssuerMetadata`, `createCredentialOffer`, `walletToke
 `walletCredential`; `createPresentationRequest`, `submitPresentation`,
 `presentationResult`. The W3C VC-API issuer and verifier interfaces are `vcIssue`,
 `vcVerify` and `vpVerify`. Which dialects and proof types are accepted is in
-[`docs/INTEROP.md`](https://github.com/Harmonizedx/open-residency/blob/main/docs/INTEROP.md).
+[`docs/INTEROP.md`](https://github.com/Harmonizedx/opnresidex/blob/main/docs/INTEROP.md).
 
 ## Outcomes are results, not exceptions
 
@@ -169,11 +171,11 @@ The named methods cover the integrator-facing surface:
 | Health | `live`, `ready` |
 | Identity | `identityChallenge`, `verifyIdentity` |
 | Residency | `countries`, `issueResidency`, `residencyStatus`, `verifyCredential`, `revokeResidency`, `eraseResidency`, `retentionSweep`, `provisionalSweep`, `reconcile` |
-| Relationship and credential lifecycle ([ADR-0007](https://github.com/Harmonizedx/open-residency/blob/main/docs/adr/0007-residency-status-is-lifecycle.md)) | `relationship`, `transitionRelationship`, `credential`, `transitionCredential`, `recordCredentialDelivery`, `credentialDeliveries`, `refusal`, `reviewRefusal` |
-| Identity links ([ADR-0014](https://github.com/Harmonizedx/open-residency/blob/main/docs/adr/0014-identity-links-are-a-record-not-a-column.md)) | `identityLinks`, `linkIdentity`, `identityLink`, `disputeIdentityLink`, `resolveIdentityLinkDispute`, `unlinkIdentity`, `relinkIdentity`, `mergeResidents`, `merge`, `splitMerge` |
-| Federation: arrival notices ([ADR-0018](https://github.com/Harmonizedx/open-residency/blob/main/docs/adr/0018-arrival-notices-under-a-declared-exclusivity-rule.md)) | `receiveArrivalNotice`, `sendArrivalNotice`, `arrivalNotices`, `arrivalNotice`, `resolveArrivalNotice`, `sweepArrivalNotices` |
-| Assurance ([ADR-0008](https://github.com/Harmonizedx/open-residency/blob/main/docs/adr/0008-assurance-registry-maps-existing-vocabularies.md)) | `assuranceProfiles`, `assuranceMappings`, `resolveAssurance`, `residentAssurance` |
-| Consent and legal bases ([ADR-0009](https://github.com/Harmonizedx/open-residency/blob/main/docs/adr/0009-legal-basis-registry-closed-vocabulary.md)) | `listConsents`, `grantConsent`, `revokeConsent`, `legalBases`, `legalBasis`, `deactivateLegalBasis` |
+| Relationship and credential lifecycle ([ADR-0007](https://github.com/Harmonizedx/opnresidex/blob/main/docs/adr/0007-residency-status-is-lifecycle.md)) | `relationship`, `transitionRelationship`, `credential`, `transitionCredential`, `recordCredentialDelivery`, `credentialDeliveries`, `refusal`, `reviewRefusal` |
+| Identity links ([ADR-0014](https://github.com/Harmonizedx/opnresidex/blob/main/docs/adr/0014-identity-links-are-a-record-not-a-column.md)) | `identityLinks`, `linkIdentity`, `identityLink`, `disputeIdentityLink`, `resolveIdentityLinkDispute`, `unlinkIdentity`, `relinkIdentity`, `mergeResidents`, `merge`, `splitMerge` |
+| Federation: arrival notices ([ADR-0018](https://github.com/Harmonizedx/opnresidex/blob/main/docs/adr/0018-arrival-notices-under-a-declared-exclusivity-rule.md)) | `receiveArrivalNotice`, `sendArrivalNotice`, `arrivalNotices`, `arrivalNotice`, `resolveArrivalNotice`, `sweepArrivalNotices` |
+| Assurance ([ADR-0008](https://github.com/Harmonizedx/opnresidex/blob/main/docs/adr/0008-assurance-registry-maps-existing-vocabularies.md)) | `assuranceProfiles`, `assuranceMappings`, `resolveAssurance`, `residentAssurance` |
+| Consent and legal bases ([ADR-0009](https://github.com/Harmonizedx/opnresidex/blob/main/docs/adr/0009-legal-basis-registry-closed-vocabulary.md)) | `listConsents`, `grantConsent`, `revokeConsent`, `legalBases`, `legalBasis`, `deactivateLegalBasis` |
 | Operator identity | `operatorLogin`, `me`, `listOperators`, `createOperator`, `disableOperator`, `listKeys`, `createKey`, `rotateKey`, `revokeKey` |
 | Audit and admin | `auditLog`, `verifyAuditChain`, `listResidents`, `stats`, `statistics`, `statisticsCsv` |
 | Data protection (admin) | `recordOfProcessing`, `dpiaFacts`, `breaches`, `recordBreach` |
@@ -219,6 +221,6 @@ the client can call is what the server serves.
 ## Project
 
 - Licence: Apache-2.0.
-- Security reports: privately, per [`SECURITY.md`](https://github.com/Harmonizedx/open-residency/blob/main/SECURITY.md). Please do not open a public issue for a vulnerability.
-- Contributing and code of conduct: [`CONTRIBUTING.md`](https://github.com/Harmonizedx/open-residency/blob/main/CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](https://github.com/Harmonizedx/open-residency/blob/main/CODE_OF_CONDUCT.md).
-- Governance: [`GOVERNANCE.md`](https://github.com/Harmonizedx/open-residency/blob/main/GOVERNANCE.md).
+- Security reports: privately, per [`SECURITY.md`](https://github.com/Harmonizedx/opnresidex/blob/main/SECURITY.md). Please do not open a public issue for a vulnerability.
+- Contributing and code of conduct: [`CONTRIBUTING.md`](https://github.com/Harmonizedx/opnresidex/blob/main/CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](https://github.com/Harmonizedx/opnresidex/blob/main/CODE_OF_CONDUCT.md).
+- Governance: [`GOVERNANCE.md`](https://github.com/Harmonizedx/opnresidex/blob/main/GOVERNANCE.md).

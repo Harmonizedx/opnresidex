@@ -113,7 +113,7 @@ profile — correct, but worth knowing when reading the output.
   (unregistered values, the empty string, a profile id used as a value), registration refusals
   (no version, no dimension, duplicate id, mapping naming an unknown profile), the derivations,
   and the identity cap.
-- `npm run conformance:orcs` criterion 3, asserted **end to end** against the record the real
+- `npm run acceptance` criterion 3, asserted **end to end** against the record the real
   `ResidencyService` issued rather than a fixture, checking resolution, governance, the §8.1
   mapping, dimension separation and the closed vocabulary.
 - Mutation-checked: opening the vocabulary to a default, and folding authentication into a

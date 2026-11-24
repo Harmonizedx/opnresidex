@@ -33,7 +33,7 @@ Examples of unacceptable behaviour:
 
 ### Specific to this project
 
-OpenResidency is identity infrastructure for real people. Two project-specific rules follow
+OpnResidex is identity infrastructure for real people. Two project-specific rules follow
 from that, and both are enforceable under this Code:
 
 - **Never contribute real personal data.** No real national identification numbers, names,

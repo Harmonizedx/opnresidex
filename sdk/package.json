@@ -1,19 +1,20 @@
 {
   "name": "@openresidency/sdk",
   "version": "0.3.0",
-  "description": "Typed client for the OpenResidency API: every operation in the server's OpenAPI description, with helpers for identity verification, residency, consent and SSO.",
+  "description": "Typed client for the OpnResidex API: every operation in the server's OpenAPI description, with helpers for identity verification, residency, consent and SSO.",
   "license": "Apache-2.0",
-  "author": "Open Residency Admin <eng@harmonizedx.com>",
-  "homepage": "https://github.com/Harmonizedx/open-residency",
+  "author": "OpnResidex Admin <eng@harmonizedx.com>",
+  "homepage": "https://github.com/Harmonizedx/opnresidex",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Harmonizedx/open-residency.git",
+    "url": "https://github.com/Harmonizedx/opnresidex.git",
     "directory": "sdk"
   },
   "bugs": {
-    "url": "https://github.com/Harmonizedx/open-residency/issues"
+    "url": "https://github.com/Harmonizedx/opnresidex/issues"
   },
   "keywords": [
+    "opnresidex",
     "openresidency",
     "digital-identity",
     "verifiable-credentials",

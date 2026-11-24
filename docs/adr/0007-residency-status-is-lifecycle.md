@@ -161,7 +161,7 @@ All four are implemented. `npm run smoke:lifecycle` covers 1-4 below (55 asserti
 criterion 1 was mutation-checked: removing the §4.3 attributes, and making the relationship
 unendable, each turn it red and name which condition failed.
 
-1. **`conformance:orcs` criterion 1 extended to assert ORCS §4.3 field presence** — all ten
+1. **`npm run acceptance` criterion 1 extended to assert ORCS §4.3 field presence** — all ten
    attributes, `type`, `purpose`, `status` and `validity` among them. Today the criterion
    asserts only that one record exists per person, that a peer's credential is attributed to
    the peer, and that an unlisted issuer is refused, so it cannot see this gap and reports PASS

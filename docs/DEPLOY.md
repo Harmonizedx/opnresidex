@@ -1,5 +1,9 @@
 # Deployment
 
+You will need Node.js 22 or later and PostgreSQL 16. The Compose file below starts the
+database, which needs Docker; the container image and the Kubernetes manifests need neither
+Node.js nor a local database on the machine you deploy from.
+
 ## Local (Docker Compose)
 
 ```bash
@@ -17,7 +21,12 @@ App on `http://localhost:3000`. Reference UI at `/app/index.html`, docs at `/doc
 Every release publishes `ghcr.io/harmonizedx/open-residency:vX.Y.Z` — the same Dockerfile CI
 scans on every merge, signed by digest, with provenance attested. The manifests below pull
 it. **Verify the digest before you run it** (the commands are in `SECURITY.md` and on the
-release page), and pin to the digest rather than the tag in anything that matters:
+release page), and pin to the digest rather than the tag in anything that matters.
+
+The repository was renamed to `Harmonizedx/opnresidex` in November 2026, and the image name
+follows the repository. Releases up to and including v0.3.0 stay where they were published,
+under `ghcr.io/harmonizedx/open-residency`. The first release after v0.3.0 and every later one
+is published to `ghcr.io/harmonizedx/opnresidex`.
 
 ```bash
 docker pull ghcr.io/harmonizedx/open-residency:v0.3.0

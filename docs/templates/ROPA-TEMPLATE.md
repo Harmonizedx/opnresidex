@@ -3,7 +3,7 @@
 A controller's register of what it processes and why. Required alongside a DPIA under most
 data protection regimes, including the Nigeria Data Protection Act.
 
-One row per processing activity. The four below are the activities a default OpenResidency
+One row per processing activity. The four below are the activities a default OpnResidex
 deployment performs; add rows for anything your jurisdiction does on top, and delete any you
 do not enable.
 

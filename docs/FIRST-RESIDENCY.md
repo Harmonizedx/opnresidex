@@ -27,7 +27,7 @@ Nothing else. No KMS account, no API contract with the identity authority, no wa
 ## 1. Get the application running
 
 ```bash
-git clone https://github.com/Harmonizedx/open-residency.git && cd open-residency
+git clone https://github.com/Harmonizedx/opnresidex.git && cd opnresidex
 npm install
 cp .env.example .env
 docker compose up -d db

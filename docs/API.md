@@ -155,7 +155,7 @@ running alongside it: the new record is `version + 1` with `supersedesId` set, a
 becomes `replaced` with `supersededById`. Exactly one consent per relying party is ever live.
 
 The signed receipt carries the controller, processor, data categories, legal basis and
-evidence, so the citizen's own copy names who is accountable without them having to ask.
+evidence, so the resident's own copy names who is accountable without them having to ask.
 
 ## Legal Basis Registry
 
@@ -176,7 +176,7 @@ platform and must not be redeclared.
 
 Withdrawing a basis stops every consent citing it. Consent expiry or withdrawal stops
 processing **unless another valid legal basis applies** — a statutory basis survives the
-citizen's consent lapsing, which is why the two are recorded separately.
+resident's consent lapsing, which is why the two are recorded separately.
 
 ## Operator identity
 
@@ -381,11 +381,11 @@ Set by `operatorAuth.mode` in the country config:
 ### Correlation
 
 The OIDC `sub` is **pairwise** by default: each relying party sees a different, stable,
-unguessable identifier for the same citizen, derived as HMAC(pepper, clientId +
+unguessable identifier for the same resident, derived as HMAC(pepper, clientId +
 residentId). The `residency` scope — which releases the correlatable `resident_id` — is
 no longer granted to every RP automatically; it is opt-in per RP via `scopes` in the
 config. Both halves are needed: pairwise subjects alone buy nothing while every service
 can still read the same `resident_id`.
 
-In production, also put citizen-facing consent routes behind the OIDC login and keep
+In production, also put resident-facing consent routes behind the OIDC login and keep
 admin behind edge restrictions (see `deploy/k8s/ingress.yaml`).

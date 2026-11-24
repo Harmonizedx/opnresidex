@@ -1,10 +1,10 @@
 # Interoperability
 
-OpenResidency issues and verifies credentials using the same standards the rest of the
+OpnResidex issues and verifies credentials using the same standards the rest of the
 digital identity ecosystem uses. The goal is that a residency credential is not a
 special thing that only our software understands — it is a W3C Verifiable Credential,
 obtained over OpenID4VCI and presented over OpenID4VP, which any compatible wallet or
-relying party can handle without writing a line of OpenResidency-specific code.
+relying party can handle without writing a line of OpnResidex-specific code.
 
 This document records what we implement, what we deliberately do not, and the
 compromises we made to interoperate with wallets as they actually exist rather than as
@@ -55,16 +55,16 @@ offline QR carries.
 OpenID4VCI defines two grants. We implement only the pre-authorized code grant, because
 it is the one that matches how residency enrollment physically happens:
 
-1. A citizen presents themselves at an enrollment desk. An operator verifies them against
+1. An applicant presents themselves at an enrollment desk. An operator verifies them against
    the foundational ID — NIN, Aadhaar, whatever the country config declares. This is the
    existing `POST /residency/issue`, unchanged.
 2. The desk calls `POST /openid4vci/offer` and shows the returned QR code, reading out a
    6-digit transaction code.
-3. The citizen scans it with their own wallet. The wallet redeems the code, proves it
+3. The resident scans it with their own wallet. The wallet redeems the code, proves it
    holds a key on the device, and receives a credential bound to that key.
 
 There is no authorization-code flow because there is nothing to authorize interactively.
-The citizen was already authenticated, in person, against their national ID.
+The resident was already authenticated, in person, against their national ID.
 
 ### Why the key proof is mandatory
 
@@ -132,7 +132,7 @@ JWTProofPayload(jwtClaimsSet.getClaim("client_id").toString(),
 ```
 
 If those claims are absent, the wallet signs its key proof with the literal string
-`"null"` as the nonce, we correctly reject the proof, and the citizen sees "enrollment
+`"null"` as the nonce, we correctly reject the proof, and the resident sees "enrollment
 failed" with no way to diagnose it. This is an eSignet implementation detail that leaked
 into the wallet, but the cost of accommodating it is one duplicated claim, and the cost of
 not accommodating it is that the wallet does not work. So our access tokens are signed
@@ -294,8 +294,8 @@ revoking its credential stay two acts.
 ## Presenting a credential (OpenID4VP)
 
 A relying party — a clinic, a subsidy desk, a bank — opens a presentation request, shows
-the citizen a QR, and gets back a verified answer. It does not integrate anything
-OpenResidency-specific to do that.
+the resident a QR, and gets back a verified answer. It does not integrate anything
+OpnResidex-specific to do that.
 
 ```
 POST /openid4vp/request        (relying party, admin key)  -> openid4vp:// URI + QR
@@ -304,7 +304,7 @@ POST /openid4vp/response/:id   (wallet, direct_post)       -> vp_token
 GET  /openid4vp/result/:id     (relying party, admin key)  -> the verdict
 ```
 
-The Request Object is **signed**, so the wallet can tell the citizen who is actually
+The Request Object is **signed**, so the wallet can tell the resident who is actually
 asking before they consent. An unsigned request would let anything capable of displaying
 a QR code impersonate a hospital and harvest residency data.
 
@@ -453,18 +453,18 @@ worth revisiting, not something to set once and forget.
 ## Sign-in ("Sign in with <State>")
 
 The residency system is also an OpenID Connect identity provider: sector services
-authenticate citizens through it and receive only the residency claims the citizen
+authenticate residents through it and receive only the residency claims the resident
 consents to release, never the national ID. Sign-in offers two factors.
 
-**Primary — Verifiable Presentation.** The citizen scans a QR and presents their residency
+**Primary — Verifiable Presentation.** The resident scans a QR and presents their residency
 credential from a wallet, over the same OpenID4VP path the rest of the platform uses. That
 proves holder binding, freshness, and audience, so the residency ID that comes back is
 *authenticated*, and a revoked credential is refused at sign-in exactly as it is at a
 clinic.
 
-**Fallback — one-time code.** For a citizen whose wallet is not to hand. The code lifecycle
+**Fallback — one-time code.** For a resident whose wallet is not to hand. The code lifecycle
 is real and enforced (single-use, expiring, attempt-bounded), but **delivery is delegated**:
-`OtpService` never sees a phone number. OpenResidency deliberately does not store plaintext
+`OtpService` never sees a phone number. OpnResidex deliberately does not store plaintext
 contact details — the schema keeps only a `phoneHash` — so an `OtpSender` implemented by the
 deployment, against its own SMS gateway and contact directory, does the sending. The
 `messaging.provider: LOG` logs the code and is for development only; a production
@@ -472,7 +472,7 @@ deployment MUST replace it.
 
 > This replaced a login handler that authenticated anyone who could name an *existing*
 > residency ID. Residency IDs are semi-public (printed on cards, carried in QR codes), so
-> that was not authentication — it was an open door to every citizen's cross-sector session.
+> that was not authentication — it was an open door to every resident's cross-sector session.
 > `scripts/sso-smoke.ts` asserts the door is shut: a stolen credential, a revoked
 > credential, and a bare residency ID all fail to sign in.
 

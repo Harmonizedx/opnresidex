@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: OpenResidency API
+  title: OpnResidex API
   version: 0.3.0
   description: >
     Open-source subnational trust infrastructure for verified, purpose-scoped jurisdictional
@@ -62,7 +62,7 @@ tags:
       OpenID for Verifiable Presentations. The standards-based path by which a relying
       party -- a clinic, a subsidy desk, a bank -- asks a citizen's wallet to present the
       residency credential, and gets back a verdict it did not have to integrate anything
-      OpenResidency-specific to obtain. Requests are signed, single-use, and short-lived;
+      OpnResidex-specific to obtain. Requests are signed, single-use, and short-lived;
       the wallet posts back with `response_mode: direct_post`.
   - name: vcapi
     description: >

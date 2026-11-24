@@ -1,14 +1,19 @@
-# OpenResidency
+# OpnResidex
 
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Harmonizedx/open-residency/badge)](https://scorecard.dev/viewer/?uri=github.com/Harmonizedx/open-residency)
+Formerly OpenResidency. The repository, and the product name in these documents, changed in
+November 2026; some technical names keep the old one, and [`CHANGELOG.md`](CHANGELOG.md) lists
+which.
 
-**Millions can't prove where they live — and lose access to services because of it.**
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Harmonizedx/opnresidex/badge)](https://scorecard.dev/viewer/?uri=github.com/Harmonizedx/opnresidex)
 
-OpenResidency lets any state, province or county verify residents against their national ID,
+**Having a national ID is not the same as being able to prove where you live — and public
+services are delivered where you live.**
+
+OpnResidex lets any state, province or county verify residents against their national ID,
 issue a W3C credential that verifies offline, and run one secure login across every sector
 service — reaching feature phones over USSD and SMS. It is open-source **subnational trust
 infrastructure**: governments establish, manage and exchange verified relationships between
-residents and their jurisdictions, giving citizens inclusive, privacy-preserving access to
+residents and their jurisdictions, giving them inclusive, privacy-preserving access to
 public services.
 
 **One deployment, one jurisdiction.** Each subnational government runs its own instance, owning
@@ -26,7 +31,7 @@ in `config/countries/` and `src/core/foundational/adapters/`, and NIN is one ada
 It turns this flow into infrastructure any state, province, or county can deploy and own:
 
 ```
-Citizen
+Resident
    -> verify against ANY national/foundational ID source (NIN, Aadhaar, Huduma, ... — API, XML/SOAP, or an imported register)
    -> issue a verifiable State Residency credential (W3C VC, works offline)
    -> one login across every sector service (Health, Tax, Permits, Subsidy, Education, ...)
@@ -42,7 +47,7 @@ are config and which are invariants nobody can override.
 
 | If you are… | Go to |
 |---|---|
-| **Deploying** OpenResidency for a jurisdiction | [Quickstart](#quickstart) → [Onboarding a jurisdiction](#onboarding-a-jurisdiction) → [`docs/DEPLOY.md`](docs/DEPLOY.md) |
+| **Deploying** OpnResidex for a jurisdiction | [Quickstart](#quickstart) → [Onboarding a jurisdiction](#onboarding-a-jurisdiction) → [`docs/DEPLOY.md`](docs/DEPLOY.md) |
 | **Integrating** an existing service (an MDA, an education/health platform) | [Integrating a service](#integrating-a-service) → [`docs/API.md`](docs/API.md), [`docs/SDK.md`](docs/SDK.md), [`docs/INTEROP.md`](docs/INTEROP.md) |
 | **Evaluating** it as a Digital Public Good / funding it | [DPG alignment](#digital-public-good-alignment) → [`docs/DPG.md`](docs/DPG.md) |
 | **Running this in a country that already uses MOSIP** | [`docs/MOSIP.md`](docs/MOSIP.md) — eSignet sign-in, IDA authentication, verifying Inji Certify credentials, and how far each is actually verified |
@@ -64,9 +69,9 @@ are config and which are invariants nobody can override.
    written at all.
 2. **Verifiable Credentials, not a lookup database.** Residency is issued as a signed W3C VC. A
    verifier confirms authenticity cryptographically, without phoning home. Credentials are issued
-   over **OpenID4VCI** and presented over **OpenID4VP**, so a citizen can hold their credential in
+   over **OpenID4VCI** and presented over **OpenID4VP**, so a resident can hold their credential in
    [Inji](https://github.com/mosip/inji-wallet) or any OpenWallet-compatible wallet, and any
-   relying party can verify it without integrating anything OpenResidency-specific. Verification
+   relying party can verify it without integrating anything OpnResidex-specific. Verification
    runs the other way too: credentials signed by an outside issuer with an older proof suite
    (`Ed25519Signature2020/2018`, `RsaSignature2018`) verify here, per federated peer and
    verify-only. When a person presents a peer's credential here and is registered here, the
@@ -80,9 +85,18 @@ are config and which are invariants nobody can override.
    Feature phones are served over USSD and SMS.
 4. **SSO across sectors.** The residency system is an OpenID Connect Identity Provider. One
    "Sign in with <State>" lets Health, Tax, Permits, Subsidy, Education, and any future service
-   trust a single login — and the citizen's national ID number is never shared with them.
+   trust a single login — and the resident's national ID number is never shared with them.
 
 ## Quickstart
+
+This README describes the `main` branch. Anything listed under **Unreleased** in
+[`CHANGELOG.md`](CHANGELOG.md) is not in the latest tagged release yet.
+
+You will need:
+
+- **Node.js 22 or later** — enough for the smoke suites below.
+- **PostgreSQL 16** for the full service. `docker compose up -d db` starts one, which needs
+  Docker; an existing PostgreSQL 16 works too, with `DATABASE_URL` pointed at it.
 
 Run the whole pipeline with no database and no live national ID source:
 
@@ -141,7 +155,7 @@ Add one file to `config/countries/`. Pick the source that matches the authority:
 These three are described declaratively and share one mapping layer, so the response-mapping and
 success-flag dot-paths are written the same way regardless of source; XML simply addresses parsed
 elements, and a dataset addresses record fields. The config controls: which source, the
-endpoint/auth or dataset path, what the citizen submits, how the response maps to a normalized
+endpoint/auth or dataset path, what the resident submits, how the response maps to a normalized
 identity, the assurance policy for issuing residency, and the credential profile (issuer DID,
 validity, type).
 
@@ -281,11 +295,11 @@ first authentication. Three integration paths, usable together:
   the national ID. On first login it maps the `sub` ⇄ its local account. Gate sensitive actions on
   the standard `acr` claim rather than `assurance_level` — see the caveat below.
 
-  The `sub` is **pairwise**: each service sees a different, stable identifier for the same citizen,
+  The `sub` is **pairwise**: each service sees a different, stable identifier for the same resident,
   so two MDAs cannot join their records on it. The `resident_id` claim — which *is* the same
   everywhere — comes from the `residency` scope and is granted only to relying parties with a
   lawful basis for holding the number itself.
-- **Credential presentation (OpenID4VP).** If the citizen holds the residency VC in a wallet, the
+- **Credential presentation (OpenID4VP).** If the resident holds the residency VC in a wallet, the
   service acts as a verifier: request a presentation, verify signature + revocation **offline**
   against the issuer DID. Good for in-person or low-connectivity.
 - **Backend verification API.** `POST /residency/verify` (validate a VC), `GET /residency/{id}`
@@ -299,7 +313,7 @@ worked example and a go-live checklist, in [`docs/INTEGRATION.md`](docs/INTEGRAT
 
 ```mermaid
 flowchart TD
-  C[Citizen] --> R[Residency Service]
+  C[Resident] --> R[Residency Service]
   R -->|resolve jurisdiction config| CFG[(Country YAML)]
   R -->|verify| F[Foundational Source Layer]
   F --> A1[REST/JSON adapter]
@@ -409,7 +423,7 @@ This repository is the generic public infrastructure, not a single-country app:
   gateway via `GENERIC_HTTP`) and a `contactDirectory`. What a deployment still owns is the
   aggregator contract itself.
 - **Cross-service correlation.** The OIDC subject is **pairwise**: each relying party sees a
-  different, stable identifier for the same citizen, so independent services cannot join records on
+  different, stable identifier for the same resident, so independent services cannot join records on
   it. The correlatable `resident_id` claim is granted per relying party via `scopes`, not to
   everyone by default — both halves are needed, since a universally readable `resident_id` would
   defeat pairwise subjects entirely.
@@ -469,7 +483,7 @@ This repository is the generic public infrastructure, not a single-country app:
   persisted), no printed ID-slip renderer, and no schema for local demographic fields — ward,
   polling unit, occupation, address. The `Resident` model holds the minimized attributes carried
   into the credential and nothing else. A jurisdiction replacing an existing enrolment-desk system
-  keeps that system, or builds the capture layer on top; the citizen-facing artifact here is the
+  keeps that system, or builds the capture layer on top; the resident-facing artifact here is the
   credential and its QR, which is what verifies offline. A card, a printed QR and a USSD lookup
   are all carriers of the same record, and a deployment may issue any of them or none.
 - **What the credential does not prove.** It states that this jurisdiction holds a residency
@@ -501,7 +515,7 @@ This repository is the generic public infrastructure, not a single-country app:
 
 ## Digital Public Good alignment
 
-OpenResidency is built to the DPG Standard: **Apache-2.0**, open standards end to end (W3C
+OpnResidex is built to the DPG Standard: **Apache-2.0**, open standards end to end (W3C
 Verifiable Credentials & DIDs, OpenID Connect, OpenID4VCI/VP, W3C Bitstring Status List), and
 privacy- and rights-by-design (national-ID tokenization, per-service consent, an enforced
 separation of residency from origin/ancestral status). It supports **SDG 16.9** (legal identity for

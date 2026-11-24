@@ -1,17 +1,18 @@
-# Publishing OpenResidency
+# Publishing OpnResidex
 
 The one-time mechanics, done with HarmonizedX's accounts. `RELEASING.md` covers the
 recurring policy: versioning, what a release contains, and the per-release checklist.
 
 ## 1. The public repository
 
-`https://github.com/Harmonizedx/open-residency` is public. CI (`.github/workflows/ci.yml`)
+`https://github.com/Harmonizedx/opnresidex` is public. CI (`.github/workflows/ci.yml`)
 runs on pull request and on push to `main`: typecheck, the smoke suites, the acceptance-criteria
 ratchet, and a Docker image build and scan. The W3C suite needs a running server and stays
 opt-in (`npm run test:w3c`). A tag push runs `release.yml`, which
 attaches the signed SBOM, source archive and conformance record to the GitHub release and
-publishes the signed image to `ghcr.io/harmonizedx/open-residency`. The first release needed
-the package made public by hand — see `RELEASING.md`.
+publishes the signed image to `ghcr.io/harmonizedx/opnresidex` (releases up to v0.3.0 are under
+`ghcr.io/harmonizedx/open-residency`, the repository's name at the time). A new package has to
+be made public by hand — see `RELEASING.md`.
 
 If the org handle ever changes, update it in: root `package.json`, `sdk/package.json`, the
 image references in `deploy/`, `SECURITY.md`, `RELEASING.md`, `docs/DEPLOY.md`, and the URLs
@@ -49,11 +50,13 @@ Package page → Settings → **Trusted Publisher** → GitHub Actions:
 | Field | Value |
 | --- | --- |
 | Organization or user | `Harmonizedx` |
-| Repository | `open-residency` |
+| Repository | `opnresidex` |
 | Workflow filename | `release.yml` |
 | Environment name | leave empty |
 
-Every field is case-sensitive and must be exact; the filename includes the extension. Then,
+Every field is case-sensitive and must be exact; the filename includes the extension. The
+repository field has to follow a rename of the repository: a publish from
+`Harmonizedx/opnresidex` is refused while this still says `open-residency`. Then,
 on the same settings page, set publishing access to **require two-factor authentication and
 disallow tokens**. Trusted publishers are unaffected by that setting, and it closes the
 token route for good.

@@ -1,4 +1,4 @@
-# Contributing to OpenResidency
+# Contributing to OpnResidex
 
 Thanks for helping build open residency infrastructure. This project is stewarded by
 HarmonizedX Limited and released under Apache-2.0.
@@ -15,7 +15,7 @@ HarmonizedX Limited and released under Apache-2.0.
 
 Every contribution — from a HarmonizedX engineer or a first-time external contributor —
 follows the same lifecycle and is held to the same review standard. The
-[GitHub issue tracker](https://github.com/Harmonizedx/open-residency/issues) is the single
+[GitHub issue tracker](https://github.com/Harmonizedx/opnresidex/issues) is the single
 source of truth for planned work.
 
 ```text

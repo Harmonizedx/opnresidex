@@ -95,7 +95,7 @@ ADR, not as a quiet relaxation of the unique constraint.
 
 ## How this is verified
 
-`npm run conformance:orcs` criterion 1 asserts the federated reading directly:
+`npm run acceptance` criterion 1 asserts the federated reading directly:
 
 - (a) a deployment issues exactly one residency per person, and re-enrolment is idempotent
       rather than duplicating;

@@ -11,7 +11,7 @@ acknowledge reports within 5 business days.
 
 ## Scope and sensitive areas
 
-OpenResidency handles identity and residency data. Please pay particular attention to,
+OpnResidex handles identity and residency data. Please pay particular attention to,
 and report responsibly, issues in:
 
 - The foundational adapter layer (any path where a raw national ID could leak or be
@@ -67,29 +67,42 @@ signature is bound to the release workflow's OIDC identity, so what you verify i
 produced by this repository's release workflow"* — a stronger and more checkable claim than
 "signed by whoever held a secret in repository settings".
 
+**The repository was renamed** from `Harmonizedx/open-residency` to `Harmonizedx/opnresidex`
+in November 2026. A signature names the repository as it was called when the release was
+built, and that does not change afterwards:
+
+| Release | Signed as | Image |
+| --- | --- | --- |
+| v0.3.0 and earlier | `Harmonizedx/open-residency` | `ghcr.io/harmonizedx/open-residency` |
+| After v0.3.0 | `Harmonizedx/opnresidex` | `ghcr.io/harmonizedx/opnresidex` |
+
+The `cosign` commands below accept either name. `gh attestation verify` takes one, so pass the
+name from the row that matches the release; a v0.3.0 file checked against the new name is
+refused.
+
 ```bash
 cosign verify-blob sbom.cyclonedx.json \
   --signature sbom.cyclonedx.json.sig \
   --certificate sbom.cyclonedx.json.pem \
-  --certificate-identity-regexp 'https://github.com/Harmonizedx/open-residency/.github/workflows/release.yml@.*' \
+  --certificate-identity-regexp '^https://github.com/Harmonizedx/(open-residency|opnresidex)/\.github/workflows/release\.yml@' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 ```
 
 Build provenance is attested separately and can be checked with
-`gh attestation verify <file> --repo Harmonizedx/open-residency`. A signature says *who*;
+`gh attestation verify <file> --repo Harmonizedx/<name>`. A signature says *who*;
 provenance says *how*.
 
 **The container image is published and signed by digest.** Every tagged release pushes
-`ghcr.io/harmonizedx/open-residency:vX.Y.Z` — version tags only, never `latest` — signed with
+`ghcr.io/harmonizedx/<name>:vX.Y.Z` — version tags only, never `latest` — signed with
 the same keyless identity and carrying a build-provenance attestation and an SBOM attestation
 in the registry. The release page names the exact digest. Verify the digest, not the tag: a
 tag can be moved, a digest is the bytes.
 
 ```bash
-cosign verify ghcr.io/harmonizedx/open-residency@sha256:<digest> \
-  --certificate-identity-regexp '^https://github.com/Harmonizedx/open-residency/\.github/workflows/release\.yml@' \
+cosign verify ghcr.io/harmonizedx/<name>@sha256:<digest> \
+  --certificate-identity-regexp '^https://github.com/Harmonizedx/(open-residency|opnresidex)/\.github/workflows/release\.yml@' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
-gh attestation verify oci://ghcr.io/harmonizedx/open-residency@sha256:<digest> --repo Harmonizedx/open-residency
+gh attestation verify oci://ghcr.io/harmonizedx/<name>@sha256:<digest> --repo Harmonizedx/<name>
 ```
 
 The image is scanned with Grype before it is pushed, at the same gate CI applies to every

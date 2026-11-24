@@ -5,7 +5,7 @@
 - Related: [ADR-0001](0001-record-architecture-decisions.md), [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md)
 - Supersedes: —
 
-> **This ADR does not change the running architecture.** OpenResidency is already hexagonal
+> **This ADR does not change the running architecture.** OpnResidex is already hexagonal
 > (a framework-free core behind ports, a thin NestJS delivery layer, swappable adapters). This
 > record *formalizes* that design, states the conventions the codebase follows as it grows, and
 > captures two targeted refinements. Behaviour, the HTTP/OIDC surface, the standards
@@ -48,9 +48,9 @@ Everything else here is documentation and convention, layered on the architectur
 
 ## The architecture, in C4
 
-**Level 1 — system context.** People and external systems around OpenResidency; no internals.
+**Level 1 — system context.** People and external systems around OpnResidex; no internals.
 
-![System context — people and external systems around OpenResidency; solid = human actors, dashed = external systems.](assets/system-context.svg)
+![System context — people and external systems around OpnResidex; solid = human actors, dashed = external systems.](assets/system-context.svg)
 
 **Level 2 — containers.** The honest runtime topology is a **modular monolith**: one NestJS
 application (one process) and one PostgreSQL database. Internal boundaries (Level 3) keep it
