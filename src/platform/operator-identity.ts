@@ -53,12 +53,44 @@ export class OperatorIdentity {
     await this.bootstrap();
   }
 
+  /**
+   * Resolve `operatorAuth.mode` when the config did not state one (OR-02).
+   *
+   * An unstated mode used to become `sharedKey` silently, in the schema default and again
+   * in the no-config fallback below. Both fired the same boot warning as a deliberate
+   * `mode: sharedKey`, so the logs could not tell an inherited default from a choice — and
+   * every shipped country config omits the block, so the default was what they all ran.
+   *
+   * Production refuses. The shared ADMIN_API_KEY carries no operator identity, so on a
+   * government residency register it means every privileged action — enrolment, revocation,
+   * compliance export — audits to one anonymous actor with no roles and no de-provisioning.
+   * That is a posture a deployment must choose in writing, not inherit from an omission.
+   *
+   * Outside production it stays `sharedKey` with the existing warning, so development and
+   * the sample configs keep working with no edit.
+   */
+  private resolveMode(stated?: 'oidc' | 'local' | 'sharedKey'): 'oidc' | 'local' | 'sharedKey' {
+    if (stated) return stated;
+
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'Refusing to start: operatorAuth.mode is not set. It no longer defaults to ' +
+          '`sharedKey`, because that mode carries no operator identity — every privileged ' +
+          'action audits to the same anonymous actor, there are no roles, and rotation ' +
+          'needs a restart. Set operatorAuth.mode to `oidc` for a real deployment, or state ' +
+          '`sharedKey` explicitly to keep the legacy single ADMIN_API_KEY.',
+      );
+    }
+
+    return 'sharedKey';
+  }
+
   private build(cfg?: CountryConfig): OperatorAuthContext {
-    const conf = cfg?.operatorAuth ?? {
-      mode: 'sharedKey' as const,
+    const stated = cfg?.operatorAuth ?? {
       issuerName: 'OpenResidency',
       local: { requireMfa: true, sessionTtlSeconds: 8 * 3600 },
     };
+    const conf = { ...stated, mode: this.resolveMode(cfg?.operatorAuth?.mode) };
     const operators = new OperatorService(this.store, {
       requireMfa: conf.local.requireMfa,
       issuerName: conf.issuerName,

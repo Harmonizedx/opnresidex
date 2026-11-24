@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, UseGuards } from '@nestjs/common';
+import { OperatorGuard } from '../common/operator.guard';
 import { PlatformService } from '../platform/platform.service';
 
 /**
@@ -51,14 +52,21 @@ export class AssuranceController {
  * Resolving a specific resident's assurance. Separate controller only because it hangs off
  * the `residency` path rather than `assurance`.
  *
- * Left unguarded to match the sibling `GET /residency/:residentId`, which is also open and
- * already returns `assuranceLevel` for the same identifier. What this route adds is the
- * governance behind that value -- the profile, the published mapping, the limitations -- all
- * of which are public by design. It releases no attribute about the person that the existing
- * lookup did not. If that lookup is ever placed behind the operator guard, this belongs
- * behind it in the same change, for the same reason.
+ * Operator-guarded since 2026-11-23, in the same change that guarded the sibling
+ * `GET /residency/:residentId` — which is what this docblock said should happen: *"If that
+ * lookup is ever placed behind the operator guard, this belongs behind it in the same
+ * change, for the same reason."* (OR-03)
+ *
+ * The reason still holds in both directions. What this route adds over the sibling is the
+ * governance behind the value — the profile, the published mapping, the limitations — all
+ * of which are public by design and remain readable unauthenticated at `GET
+ * /assurance/profiles` and `GET /assurance/mappings`. What it must not do is confirm that a
+ * given residentId resolves to anyone, which is the half the guard closes.
+ *
+ * No `@RequireRoles`: any authenticated operator may read it, matching the sibling.
  */
 @Controller('residency')
+@UseGuards(OperatorGuard)
 export class ResidentAssuranceController {
   constructor(private platform: PlatformService) {}
 
