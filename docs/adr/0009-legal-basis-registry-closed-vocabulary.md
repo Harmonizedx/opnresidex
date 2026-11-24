@@ -140,7 +140,7 @@ able to disagree with the config file a reviewer actually reads.
   bearer token is replayed after withdrawal and no longer releases the residency claim, while
   `sub` still resolves so authentication is unaffected. Asserting this against the domain object
   alone is what let the gap exist in the first place.
-- `npm run conformance:orcs` — criterion 4 asserts all eight §9 grant attributes, that an
+- `npm run acceptance` — criterion 4 asserts all eight §9 grant attributes, that an
   unregistered reference is refused rather than stored, that a repealed basis stays readable
   while no longer resolving, and that withdrawing a basis stops the grants relying on it.
   Criterion 4 was PARTIAL [G-09]; it is now PASS.

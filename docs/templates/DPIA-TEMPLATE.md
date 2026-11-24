@@ -1,6 +1,6 @@
 # Data Protection Impact Assessment — template
 
-For a deployment of OpenResidency. Complete before processing real residents' data.
+For a deployment of OpnResidex. Complete before processing real residents' data.
 
 A DPIA assesses **a deployment**, not software. This repository processes nobody's data;
 your instance does. Where a row below is already answered by the software's design, the

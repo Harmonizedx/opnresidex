@@ -36,7 +36,8 @@ register extract in [`FIRST-RESIDENCY.md`](FIRST-RESIDENCY.md).
 
 ## Use
 
-See `sdk/README.md` for the full method table. Quick example:
+See `sdk/README.md` for the full method table. Quick example (the hostname is a placeholder,
+not a live deployment):
 
 ```ts
 import { OpenResidencyClient } from '@openresidency/sdk';

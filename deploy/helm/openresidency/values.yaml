@@ -1,6 +1,9 @@
 replicaCount: 2
 
 image:
+  # v0.3.0 and earlier are published under this name. The repository is now
+  # Harmonizedx/opnresidex, and every release after v0.3.0 is published to
+  # ghcr.io/harmonizedx/opnresidex; this line moves in that release's pull request.
   repository: ghcr.io/harmonizedx/open-residency
   # Empty means the chart's appVersion, as `v<appVersion>` -- the tag the release workflow
   # publishes. There is no `latest`: a release is a fixed version, never a moving pointer.

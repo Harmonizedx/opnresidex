@@ -128,7 +128,7 @@ assessment nobody has re-made.
   disputed link refuses re-issuance until resolved, a merged identifier finds the survivor,
   a split restores it and re-enrolment opens a fresh relationship, and unlinking the
   foundational identifier suspends first.
-- `npm run conformance:orcs` criterion 6 asserts the same through the residency service and
+- `npm run acceptance` criterion 6 asserts the same through the residency service and
   reports PASS; the baseline records it, so a regression fails the build.
 - `npm run test:store-e2e` round-trips every column of the three tables through the Prisma
   store on a real PostgreSQL and runs the registry unchanged on it.

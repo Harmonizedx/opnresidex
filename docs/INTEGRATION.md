@@ -1,11 +1,11 @@
-# Integrating a service with OpenResidency
+# Integrating a service with OpnResidex
 
 This guide is for a team that already runs a platform — a ministry service, an education or
-health portal, a payments or permits system — and wants to use OpenResidency for **identity and
+health portal, a payments or permits system — and wants to use OpnResidex for **identity and
 authentication** without rebuilding their app around it.
 
 The central idea: **you do not merge databases.** Your platform keeps its own users and its own
-business logic. OpenResidency gives you a trustworthy, consented answer to "who is this person and
+business logic. OpnResidex gives you a trustworthy, consented answer to "who is this person and
 where do they reside," and you link that answer to your existing account **once, at first
 authentication**. After that, every future login is recognized.
 
@@ -39,11 +39,14 @@ party to services with a lawful basis for holding the number. Do not build accou
 
 ---
 
+The hostnames used throughout this guide, `id.katsina.gov.ng` and
+`scholarship.katsina.gov.ng`, are examples. They are not live deployments.
+
 ## Path A — Sign in with State (OpenID Connect)
 
-The primary path for a web or mobile platform that wants login + identity. OpenResidency is a
+The primary path for a web or mobile platform that wants login + identity. OpnResidex is a
 standards OIDC Identity Provider, so you integrate with **any off-the-shelf OIDC library** — nothing
-OpenResidency-specific runs in your app.
+OpnResidex-specific runs in your app.
 
 ### 1. Register your service as a relying party (YAML, no code change)
 
@@ -53,12 +56,13 @@ Add an entry under `oidc.relyingParties` in the jurisdiction's config in `config
 oidc:
   relyingParties:
     - clientId: ktsg_scholarship            # stable; also names the secret env var
-      name: Katsina Scholarship Board       # shown to the citizen on the consent screen
+      name: Katsina Scholarship Board       # shown to the resident on the consent screen
       sector: education                      # becomes a scope; add a sector without code
+      scopes: [profile]                      # add `residency` only with a lawful basis for the Resident ID
       redirectUris:
-        - https://scholarship.kt.gov.ng/auth/callback
+        - https://scholarship.katsina.gov.ng/auth/callback
       postLogoutRedirectUris:
-        - https://scholarship.kt.gov.ng/
+        - https://scholarship.katsina.gov.ng/
 ```
 
 The client secret is **never** in the file. It is read from an environment variable named
@@ -89,7 +93,7 @@ The ID token / userinfo carries **only** these, and **never the national ID numb
 | `profile` | `name`, `given_name`, `family_name`, `birthdate`, `gender` |
 | `residency` (granted per relying party, not by default) | `resident_id`, `country_code`, `subnational_unit`, `assurance_level`, `provisional` |
 
-The citizen logs in once at the state IdP and **consents per service**; consent is a first-class,
+The resident logs in once at the state IdP and **consents per service**; consent is a first-class,
 revocable record and is written to the tamper-evident audit log.
 
 ### 4. Minimal callback (Node, `openid-client` v5)
@@ -100,11 +104,11 @@ This sample uses version 5 of the library (`npm install openid-client@5`). Versi
 ```js
 import { Issuer, generators } from 'openid-client';
 
-const issuer = await Issuer.discover('https://id.kt.gov.ng/oidc');
+const issuer = await Issuer.discover('https://id.katsina.gov.ng/oidc');
 const client = new issuer.Client({
   client_id: 'ktsg_scholarship',
   client_secret: process.env.KTSG_SCHOLARSHIP_CLIENT_SECRET,
-  redirect_uris: ['https://scholarship.kt.gov.ng/auth/callback'],
+  redirect_uris: ['https://scholarship.katsina.gov.ng/auth/callback'],
   response_types: ['code'],
   token_endpoint_auth_method: 'client_secret_basic',
 });
@@ -122,7 +126,7 @@ res.redirect(url);
 // --- callback ---
 const params = client.callbackParams(req);
 const tokenSet = await client.callback(
-  'https://scholarship.kt.gov.ng/auth/callback',
+  'https://scholarship.katsina.gov.ng/auth/callback',
   params,
   { code_verifier: req.session.cv },
 );
@@ -134,20 +138,20 @@ if (!user) user = await db.users.create({ sub: c.sub, name: c.name });
 req.session.userId = user.id;         // logged in
 ```
 
-That "account linking" block is the only OpenResidency-aware code in your app.
+That "account linking" block is the only OpnResidex-aware code in your app.
 
 ---
 
 ## Path B — Credential presentation (OpenID4VP)
 
-Use this when the citizen holds their residency credential in a wallet (Inji / OpenWallet), or for
+Use this when the resident holds their residency credential in a wallet (Inji / OpenWallet), or for
 in-person and low-connectivity checks where a browser redirect is impractical. Your service acts as
 a **verifier**:
 
 1. Build an OpenID4VP request for a residency credential.
 2. The wallet presents the VC.
 3. You verify the signature and revocation status **offline**, against the issuer's DID document and
-   the cached Bitstring Status List — no callback to OpenResidency needed.
+   the cached Bitstring Status List — no callback to OpnResidex needed.
 
 Because verification is cryptographic and offline, this works air-gapped and at the edge. See
 [`INTEROP.md`](INTEROP.md) for the request/response shapes and wallet compatibility notes.
@@ -169,7 +173,7 @@ With the typed SDK ([`SDK.md`](SDK.md)):
 
 ```js
 import { OpenResidencyClient } from '@openresidency/sdk';
-const or = new OpenResidencyClient({ baseUrl: 'https://id.kt.gov.ng' });
+const or = new OpenResidencyClient({ baseUrl: 'https://id.katsina.gov.ng' });
 
 const outcome = await or.verifyCredential(credentialJwt);   // POST /residency/verify
 const status  = await or.residencyStatus('KT-7F3A-9K2P-4'); // GET  /residency/{id}
@@ -179,19 +183,19 @@ Full API surface: [`API.md`](API.md) and the OpenAPI spec at `/openapi.yaml` (`/
 
 ---
 
-## What OpenResidency does NOT decide for you
+## What OpnResidex does NOT decide for you
 
 A residency login proves **who** the person is and **that they reside** in the jurisdiction. It does
 **not** prove **entitlement**. Your service keeps its own eligibility rules and runs them over the
 claims it receives:
 
 ```
-OpenResidency  ->  verified identity + residency claims   (the input)
+OpnResidex     ->  verified identity + residency claims   (the input)
 Your platform  ->  "is this a registered student, in the age band,
                     resident >= 12 months?"               (your business logic)
 ```
 
-This is deliberate: OpenResidency establishes *who someone is and where they are resident*, and
+This is deliberate: OpnResidex establishes *who someone is and where they are resident*, and
 stops there. Deciding what that entitles them to is your platform's business logic, and it stays
 yours. You inherit identity and residency assurance; you do not surrender your domain logic.
 
@@ -205,7 +209,7 @@ yours. You inherit identity and residency assurance; you do not surrender your d
       via `GENERIC_HTTP`) and a `contactDirectory`. Omit them and the fallback is switched off;
       `provider: LOG` still prints codes and refuses to boot without an explicit acknowledgement.
 - [ ] **Cross-service correlation.** The OIDC `sub` is now **pairwise** by default — each relying
-      party sees a different, stable identifier for the same citizen, derived under the deployment
+      party sees a different, stable identifier for the same resident, derived under the deployment
       pepper. Plan for this: your service's `sub` will not match any other service's, which is the
       point. The correlatable `resident_id` claim comes from the `residency` scope, which is
       granted per relying party in config and is **not** given to every RP any more. If your

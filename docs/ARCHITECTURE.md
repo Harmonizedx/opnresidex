@@ -1,6 +1,6 @@
 # Architecture
 
-OpenResidency is built as a small framework-agnostic core with thin NestJS delivery
+OpnResidex is built as a small framework-agnostic core with thin NestJS delivery
 around it. This split is deliberate: the core carries the identity, credential,
 consent, and audit logic with no web framework, so it is unit-testable (see the smoke
 test) and embeddable as a library, while NestJS only handles HTTP, wiring, and
@@ -76,7 +76,7 @@ Around the core, in the delivery layer and outside it:
 
 ## Data flow: enroll to SSO
 
-1. Citizen submits foundational identifiers. The foundational adapter verifies against
+1. Resident submits foundational identifiers. The foundational adapter verifies against
    the national ID API and returns a NormalizedIdentity with a tokenized `subjectRef`.
    The raw national ID never leaves the adapter. This step establishes that the identity
    **record** is genuine — it does not, on its own, establish that the applicant **owns**
@@ -93,7 +93,7 @@ Around the core, in the delivery layer and outside it:
    assigns a revocation index, and persists a minimized record. An audit event records
    which binding method was achieved.
 4. A sector service verifies the credential (online or fully offline) via the verifier.
-5. For SSO, the citizen signs in once at the OIDC provider. On consent, a first-class
+5. For SSO, the resident signs in once at the OIDC provider. On consent, a first-class
    ConsentRecord is stored, a signed receipt is minted, and an audit event is recorded.
    The ID token carries residency claims but never the national ID.
 

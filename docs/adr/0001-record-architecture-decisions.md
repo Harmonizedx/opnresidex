@@ -5,7 +5,7 @@
 
 ## Context
 
-We need to record the architectural decisions made on OpenResidency so the *reasoning*
+We need to record the architectural decisions made on OpnResidex so the *reasoning*
 survives contributor turnover — not just *what* the architecture is, but *why*, and which
 alternatives were weighed. `docs/ARCHITECTURE.md` is a living description of the current
 design; it does not capture decisions, their context, or the options considered.

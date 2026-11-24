@@ -2,7 +2,7 @@
 
 ## Ownership
 
-OpenResidency is owned and stewarded by **HarmonizedX Limited** (RC 2011004, Abuja,
+OpnResidex is owned and stewarded by **HarmonizedX Limited** (RC 2011004, Abuja,
 Nigeria; <https://harmonizedx.ng>). HarmonizedX holds the copyright on the project's original work and is
 responsible for its direction, releases, and its listing as a Digital Public Good.
 
@@ -17,7 +17,7 @@ The maintainer team is appointed by HarmonizedX. Maintainers review and merge ch
 cut releases, and triage security reports.
 
 - **Chinonso Williams** (<nonso@harmonizedx.com>) — original author and lead maintainer.
-  Created OpenResidency before it was handed to HarmonizedX for stewardship.
+  Created OpnResidex before it was handed to HarmonizedX for stewardship.
 - HarmonizedX Limited (engineering) — maintainer team.
 
 ## How decisions are made

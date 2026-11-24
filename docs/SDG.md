@@ -1,6 +1,6 @@
 # Sustainable Development Goal mapping
 
-OpenResidency maps to one primary Sustainable Development Goal and five supporting ones.
+OpnResidex maps to one primary Sustainable Development Goal and five supporting ones.
 Every mapping below is anchored to a capability that exists in the codebase today — a file,
 endpoint, or documented mechanism — rather than an aspiration. This is the authoritative SDG
 list; `docs/DPG.md` references it and must stay consistent with it.

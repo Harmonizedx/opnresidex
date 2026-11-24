@@ -1,6 +1,6 @@
 # Digital Public Good alignment
 
-This is the single source of truth for OpenResidency's DPG Standard alignment: the mapping to
+This is the single source of truth for OpnResidex's DPG Standard alignment: the mapping to
 the nine indicators, the evidence for each, the honest gaps, and the registry submission pack.
 It is written to be candid about what is in place today and what an adopting team must
 complete; where an indicator is not yet fully met, it says so rather than reframing the
@@ -21,7 +21,7 @@ apart, and a reviewer reads both.
 - **[OpenID4VCI](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0.html) / [OpenID4VP](https://openid.net/specs/openid-4-verifiable-presentations-1_0.html)** for wallet-based issuance and presentation.
 - **[EdDSA / Ed25519](https://www.rfc-editor.org/rfc/rfc8032)** for compact signatures suitable for QR and paper carriage.
 
-Building on these open standards is deliberate: it keeps OpenResidency interoperable with any
+Building on these open standards is deliberate: it keeps OpnResidex interoperable with any
 conformant wallet, verifier, or relying party, and avoids a proprietary lock-in that would
 disqualify it as a DPG.
 
@@ -99,7 +99,7 @@ Evidence: `README.md`, `docs/README.md`, `docs/ARCHITECTURE.md`, `docs/API.md`,
 The Standard's own wording: *"Digital public goods with non-personally identifiable
 information (PII) design for possibility of extracting or importing non-PII data and content
 from the system in a non-proprietary format."* Note that it asks about **import** as well as
-export, and about **content** as well as data. OpenResidency provides four mechanisms, none
+export, and about **content** as well as data. OpnResidex provides four mechanisms, none
 of which carries personal data; on content, the system holds none at all — there is no
 user-generated content (indicator 9b):
 
@@ -146,12 +146,12 @@ landed):
 | Data minimisation | **Met.** Raw national IDs are never stored; only an HMAC-tokenised `subjectRef` is persisted. The national ID is never shared with relying parties. A phone number is stored only where the jurisdiction sets `contactDirectory.mode: encrypted`, as ciphertext off the residency port, so the core service cannot reach it; in every other mode only a one-way hash is kept. |
 | User consent mechanisms | **Met.** First-class, revocable consent records with signed, portable receipts, plus per-client OIDC consent. Each grant states the attributes [ADR-0009](adr/0009-legal-basis-registry-closed-vocabulary.md) requires — controller, processor, data categories, evidence of agreement — and its `legalBasisReference` resolves through the Legal Basis Registry: an unregistered reference is refused rather than stored, and a grant missing data categories or evidence is refused rather than written blank. Withdrawing a basis stops processing under it, while the repealed entry stays readable. |
 | Data usage transparency | **Met.** `docs/PRIVACY.md` states what is collected, what is deliberately not, who receives it, and the known gaps. |
-| Privacy by design (PII deletion) | **Met.** `POST /residency/{id}/erase` destroys every identifying field and redacts the subject from the audit log. The credential is revoked first, so what the citizen holds is dead before its subject becomes unidentifiable. |
+| Privacy by design (PII deletion) | **Met.** `POST /residency/{id}/erase` destroys every identifying field and redacts the subject from the audit log. The credential is revoked first, so what the resident holds is dead before its subject becomes unidentifiable. |
 | Data retention transparency | **Met.** Per-jurisdiction periods under `residency.retention`, enforced by `POST /residency/retention/sweep` — dry-run unless `confirm: true`, so the scope of a bulk irreversible operation is seen before it runs. A legal hold suspends it entirely. The shipped default expires nothing: retention is a controller's decision against their own law. Residency records only; consent and audit have no automatic expiry, and no scheduler runs the sweep. |
 | Data governance and access controls | **Met.** Role-scoped operator identity with per-operator API keys and rotation, replacing a shared admin key; privileged reads are audited to a named operator; the audit log is a tamper-evident hash chain. |
 
 **How erasure and a tamper-evident log were reconciled.** They pull in opposite directions:
-the citizen may require their data destroyed, and the register must show nothing was quietly
+the resident may require their data destroyed, and the register must show nothing was quietly
 rewritten. Deleting rows satisfies the first and destroys the second. So erasure removes the
 person, not the record that a transaction occurred — identifying fields are destroyed, audit
 events naming the subject are *redacted* with their hashes retained, and each redaction is
@@ -329,9 +329,9 @@ nine sections above — paste from there rather than rewriting them here.
 
 ## Project basics
 
-- Name: OpenResidency
+- Name: OpnResidex (formerly OpenResidency)
 - Owner / submitting organization: HarmonizedX Limited (RC 2011004, Abuja, Nigeria)
-- Repository: https://github.com/Harmonizedx/open-residency *(must be public at submission time)*
+- Repository: https://github.com/Harmonizedx/opnresidex *(must be public at submission time)*
 - License: Apache-2.0
 - Sector: Digital identity, digital public infrastructure
 - Type: Software
@@ -340,7 +340,7 @@ nine sections above — paste from there rather than rewriting them here.
 
 Open-source subnational trust infrastructure that lets governments establish, manage and
 exchange verified, purpose-scoped jurisdictional relationships between residents and their
-jurisdictions — giving citizens inclusive, privacy-preserving access to public services. It
+jurisdictions — giving them inclusive, privacy-preserving access to public services. It
 binds any national foundational ID (NIN, Aadhaar, Huduma, and others via config) to a W3C
 Verifiable Credential, works offline for low-connectivity areas, and records consent and a
 tamper-evident audit trail. Reusable by any state, province, or county.

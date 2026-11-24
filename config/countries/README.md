@@ -14,7 +14,7 @@ Three optional blocks tune interoperability and sign-in:
 
 5. Which wallets can obtain a credential, and on what terms? (`wallet`)
 6. How are presentations requested? (`presentation`)
-7. Which sector services can citizens sign into with their residency? (`oidc`)
+7. Which sector services can residents sign into with their residency? (`oidc`)
 
 `wallet` and `presentation` default to the widest interoperable behaviour, so **omitting them is safe** — that is
 what `ng.yaml`, `in.yaml`, and `ke.yaml` do. `demo.yaml` spells every knob out with the
@@ -49,9 +49,9 @@ non-standard claims — so move here as soon as your wallets allow.
 
 ## Sign-in relying parties (`oidc`)
 
-Sector services — Health, Tax, Permits, Subsidy — authenticate citizens through this
+Sector services — Health, Tax, Permits, Subsidy — authenticate residents through this
 residency IdP ("Sign in with <State>"). They never see the national ID, only the
-residency claims the citizen consents to release.
+residency claims the resident consents to release.
 
 These used to be a hardcoded list in `src/sso/oidc.provider.ts`, which made a relying
 party the **one** thing about a country that required a TypeScript edit. They are now

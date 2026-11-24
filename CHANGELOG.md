@@ -12,6 +12,26 @@ current verdict for every criterion; where the two disagree, the suite is right.
 
 ## [Unreleased]
 
+### Changed
+
+**The project is now OpnResidex, and the repository is `Harmonizedx/opnresidex`.** It was
+OpenResidency, at `Harmonizedx/open-residency`. Old links redirect. Earlier entries in this file
+keep the name they were written under.
+
+What follows the repository's name moves with it, from the first release after v0.3.0: the
+container image is published to `ghcr.io/harmonizedx/opnresidex`, and release signatures and
+provenance name `Harmonizedx/opnresidex`. Releases up to v0.3.0 stay under
+`ghcr.io/harmonizedx/open-residency` and verify only against the old name; `SECURITY.md` gives
+commands that cover both.
+
+What does not change, because other systems depend on the exact value: the npm package
+`@openresidency/sdk` and its `OpenResidencyClient` and `OpenResidencyError` classes; the
+credential context `https://openresidency.org/contexts/residency/v1` and its vocabulary, which
+are signed into every credential; the `urn:openresidency:aal1` to `aal3` sign-in values; the
+`openres:` QR prefixes; the `openresidency_*` metric names; and the Helm chart, Kubernetes
+resource names and source archive name. Messages a deployment sends still default to the
+issuer name "OpenResidency" where `credential.issuerName` is not set.
+
 ### Added
 
 **Arrival notices between federated jurisdictions, under a declared exclusivity rule.** When a

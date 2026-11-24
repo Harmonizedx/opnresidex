@@ -44,10 +44,17 @@ openapi="$(sed -n 's/^  version: //p' docs/openapi.yaml | head -1)"
 chart="$(sed -n 's/^appVersion: "\(.*\)"$/\1/p' deploy/helm/openresidency/Chart.yaml)"
 [ "$openapi" = "$want" ] || say "docs/openapi.yaml info.version is ${openapi}, package.json is ${want}"
 [ "$chart" = "$want" ] || say "deploy/helm/openresidency/Chart.yaml appVersion is ${chart}, package.json is ${want}"
+#
+# The image is named after the repository, which was open-residency through v0.3.0 and is
+# opnresidex after it. A release is only ever published under the name the repository had
+# when it was built, so the version and the name have to agree as well.
+if [ "$want" = "0.3.0" ]; then image="open-residency"; else image="opnresidex"; fi
 for f in deploy/k8s/app.yaml docs/DEPLOY.md; do
-  stale="$(grep -oE 'open-residency:v[0-9]+\.[0-9]+\.[0-9]+' "$f" | grep -vx "open-residency:v${want}" | sort -u | tr '\n' ' ' || true)"
-  [ -z "$stale" ] || say "${f} names ${stale}but package.json is ${want}"
+  stale="$(grep -oE '(open-residency|opnresidex):v[0-9]+\.[0-9]+\.[0-9]+' "$f" | grep -vx "${image}:v${want}" | sort -u | tr '\n' ' ' || true)"
+  [ -z "$stale" ] || say "${f} names ${stale}but ${want} is published as ${image}:v${want}"
 done
+repo="$(sed -n 's/^  repository: //p' deploy/helm/openresidency/values.yaml | head -1)"
+[ "$repo" = "ghcr.io/harmonizedx/${image}" ] || say "deploy/helm/openresidency/values.yaml image.repository is ${repo}, but ${want} is published to ghcr.io/harmonizedx/${image}"
 
 if ! grep -qE "^## ${want//./\\.} — [0-9]{4}-[0-9]{2}-[0-9]{2}" CHANGELOG.md; then
   say "CHANGELOG.md has no '## ${want} — <date>' section"

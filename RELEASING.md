@@ -1,4 +1,4 @@
-# Releasing OpenResidency
+# Releasing OpnResidex
 
 What a release of this project *is*, what it promises, and the checklist for cutting one.
 
@@ -44,7 +44,7 @@ attaches to the GitHub release:
   signature binds to the workflow's OIDC identity, so a verifier checks *"produced by this
   repository's release workflow"* rather than *"signed by whoever held a secret"*.
 - **Build provenance attestations.**
-- **The container image**, `ghcr.io/harmonizedx/open-residency:vX.Y.Z`, built from the tag,
+- **The container image**, `ghcr.io/harmonizedx/opnresidex:vX.Y.Z`, built from the tag,
   scanned before it is pushed, signed by digest with the same keyless identity, with build
   provenance and an SBOM attested in the registry. The release notes name the digest. Version
   tags only: there is no `latest`, because a release is never a moving pointer, and the
@@ -88,6 +88,11 @@ this one.
    `docs/openapi.yaml` (`info.version`), the Helm chart's `appVersion`, and the image tags in
    `deploy/k8s/app.yaml` and `docs/DEPLOY.md`; bump those in the same pull request. The
    check covers them too.
+   The first release after v0.3.0 also moves the image name: change
+   `ghcr.io/harmonizedx/open-residency` to `ghcr.io/harmonizedx/opnresidex` in
+   `deploy/helm/openresidency/values.yaml`, `deploy/k8s/app.yaml` and the examples in
+   `docs/DEPLOY.md`, in the same pull request. `scripts/check-release-versions.sh` fails until
+   they are moved.
 8. **The release-prep pull request is merged, and you are on it.** Then check, tag and push:
    ```bash
    git checkout main && git pull --ff-only
@@ -108,17 +113,20 @@ this one.
     workflow emits a `.sig` and a `.pem` per asset, not a bundle:
     ```bash
     cosign verify-blob SHA256SUMS --signature SHA256SUMS.sig --certificate SHA256SUMS.pem \
-      --certificate-identity-regexp '^https://github.com/Harmonizedx/open-residency/\.github/workflows/release\.yml@' \
+      --certificate-identity-regexp '^https://github.com/Harmonizedx/opnresidex/\.github/workflows/release\.yml@' \
       --certificate-oidc-issuer https://token.actions.githubusercontent.com
-    cosign verify ghcr.io/harmonizedx/open-residency@sha256:<digest from the release notes> \
-      --certificate-identity-regexp '^https://github.com/Harmonizedx/open-residency/\.github/workflows/release\.yml@' \
+    cosign verify ghcr.io/harmonizedx/opnresidex@sha256:<digest from the release notes> \
+      --certificate-identity-regexp '^https://github.com/Harmonizedx/opnresidex/\.github/workflows/release\.yml@' \
       --certificate-oidc-issuer https://token.actions.githubusercontent.com
     ```
-11. **First release only: make the package public.** A container package created by a
-    workflow is private until someone changes it — GHCR does not inherit the repository's
-    visibility. Repository → Packages → `open-residency` → Package settings → Change
-    visibility → Public. Then `docker pull` it from a machine with no GitHub credentials to
-    confirm.
+    Releases up to v0.3.0 were built when the repository was `Harmonizedx/open-residency`, and
+    verify only against that name and the `ghcr.io/harmonizedx/open-residency` image.
+11. **First release under a new image name: make the package public.** A container package
+    created by a workflow is private until someone changes it — GHCR does not inherit the
+    repository's visibility. This applied to the first release, and applies again to the first
+    release after the rename, which creates a new package. Repository → Packages →
+    `opnresidex` → Package settings → Change visibility → Public. Then `docker pull` it from a
+    machine with no GitHub credentials to confirm.
 12. **Confirm the SDK landed.** The `sdk` job publishes it through npm trusted publishing
     and refuses when `sdk/package.json` does not match the tag, so a failure here is step 7
     skipped.

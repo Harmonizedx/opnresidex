@@ -1,6 +1,6 @@
 # Working with a MOSIP deployment
 
-OpenResidency is not built on MOSIP and does not require it. But a subnational government
+OpnResidex is not built on MOSIP and does not require it. But a subnational government
 adopting this is very often working inside a country that already runs MOSIP nationally, and
 in that case the residency system should use the national identity that already exists rather
 than ask residents to prove themselves twice.

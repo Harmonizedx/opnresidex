@@ -44,7 +44,7 @@ superseded and retained only as history.**
 | Authority | Normative — defines conformance | Advisory — defines a recommended construction |
 | A deviation is | a conformance failure | a design decision |
 | Remedy | change the code, or amend the specification | record an ADR |
-| Verified by | `npm run conformance:orcs` | ordinary integration tests |
+| Verified by | `npm run acceptance` | ordinary integration tests |
 | When silent | fall through to ORRA | fall through to engineering judgement |
 
 Worked example. ORCS §12 requires that events "MUST use a canonical, versioned envelope and
@@ -56,7 +56,7 @@ data is a conformance failure.
 ### Conformance is machine-checked
 
 ORCS §15's nine acceptance criteria are asserted by `scripts/acceptance-criteria.ts`
-(`npm run conformance:orcs`). Conformance is what that suite reports, not what any document
+(`npm run acceptance`). Conformance is what that suite reports, not what any document
 claims — including this one, which is why no pass/fail count is quoted here. Run the command.
 
 It is red today, and deliberately excluded from CI while it is red, because a

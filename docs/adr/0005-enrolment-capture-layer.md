@@ -6,7 +6,7 @@
 
 ## Context
 
-OpenResidency issues a credential. It does not run an enrolment desk. A jurisdiction replacing
+OpnResidex issues a credential. It does not run an enrolment desk. A jurisdiction replacing
 an existing state IDMS finds three things missing, and all three are things that IDMS does at
 the counter rather than at the credential layer:
 
@@ -139,7 +139,7 @@ cards does not thereby build a second, weaker verification path it then has to d
 
 ## Consequences
 
-**Good.** A jurisdiction with an existing enrolment desk can adopt OpenResidency without
+**Good.** A jurisdiction with an existing enrolment desk can adopt OpnResidex without
 losing the counter workflow. The privacy posture stays intact by default and degrades only
 where a jurisdiction has explicitly recorded a legal basis. The slip is offline-verifiable,
 which the incumbent systems' QR codes generally are not.

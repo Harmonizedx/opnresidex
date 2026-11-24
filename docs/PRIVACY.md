@@ -1,6 +1,6 @@
 # Data protection
 
-How OpenResidency handles personal data, what a deployer must decide, and what the software
+How OpnResidex handles personal data, what a deployer must decide, and what the software
 enforces on their behalf.
 
 This is a statement about **the software**. A deployment is a data controller in its own
@@ -47,7 +47,7 @@ service has no capability to touch a phone number.
 
 ## 3. Consent
 
-Consent is a first-class, revocable record with a signed, portable receipt the citizen keeps.
+Consent is a first-class, revocable record with a signed, portable receipt the resident keeps.
 Grant, inspect, withdraw, expire and audit are all supported.
 
 **Expiry is enforced, not merely recorded.** A consent granted with a validity period stops
@@ -64,7 +64,7 @@ authority instead, that is a different basis and must be recorded as such: decla
 
 `POST /residency/{residentId}/erase` (operator, `admin` role).
 
-Erasure and a tamper-evident register pull in opposite directions: the citizen may require
+Erasure and a tamper-evident register pull in opposite directions: the resident may require
 their data destroyed, and the register must be able to show nothing was quietly rewritten.
 Deleting rows satisfies the first and destroys the second. The resolution is that erasure
 removes **the person**, not the record that a transaction occurred:
@@ -113,7 +113,7 @@ runs: `POST /residency/retention/sweep` (`admin` role).
 
 **The shipped default expires nothing.** A retention period is a controller's decision against
 their own law, and a default number here would be this software quietly setting policy for a
-government — wrong in both directions, since too short destroys records a citizen needs for an
+government — wrong in both directions, since too short destroys records a resident needs for an
 appeal and too long is itself a breach.
 
 **The sweep is a dry run unless you pass `confirm: true`.** It returns exactly which residents
@@ -149,7 +149,7 @@ is why the redaction record names them.
 | Know who accessed the record | `POST /me/access-log`, after the resident proves themselves with their credential, a USSD session or a one-time code. Staff are reduced to a kind; relying parties are named. |
 | Human review of a refusal | `GET /residency/refusals/{reference}` for the reason and appeal path; `POST /residency/refusals/{reference}/review` records the reviewer's outcome, which may overturn it |
 | Rectification of linked identifiers | The dispute, unlink and relink routes under identity links (`docs/API.md`) |
-| Portability | Consent receipts are signed, portable JWTs the citizen holds; the credential itself is a portable W3C VC |
+| Portability | Consent receipts are signed, portable JWTs the resident holds; the credential itself is a portable W3C VC |
 | Erasure | `POST /residency/{residentId}/erase` |
 | Withdraw consent | `POST /consent/{id}/revoke` — blocks future consent-dependent disclosure and revokes the associated OIDC grant |
 
