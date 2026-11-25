@@ -48,7 +48,9 @@ export class MetaController {
           /* try next */
         }
       }
-      this.specCache ??= 'openapi: 3.1.0\ninfo:\n  title: OpenResidency API\n  version: 0.1.0\npaths: {}\n';
+      this.specCache ??=
+        'openapi: 3.1.0\ninfo:\n  title: OpnResidex API\n  version: unknown\n' +
+        '  description: docs/openapi.yaml was not found in this build.\npaths: {}\n';
     }
     return this.specCache;
   }
