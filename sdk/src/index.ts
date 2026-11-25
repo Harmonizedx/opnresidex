@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * OpenResidency Interoperability SDK.
+ * OpnResidex Interoperability SDK.
  *
- * A small, dependency-free typed client for the OpenResidency API. Uses the global
+ * A small, dependency-free typed client for the OpnResidex API. Uses the global
  * fetch (Node 18+ or any browser).
  *
  * Two layers:
@@ -222,7 +222,7 @@ export class OpenResidencyError extends Error {
     public status: number,
     public body: unknown,
   ) {
-    super(`OpenResidency API error ${status}`);
+    super(`OpnResidex API error ${status}`);
   }
 }
 

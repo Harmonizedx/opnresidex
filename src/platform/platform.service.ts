@@ -69,6 +69,7 @@ import { tokenizeSubject } from '../core/foundational/util';
 import { IdentityLinkRegistry } from '../core/identity/identity-link';
 import { createHash, timingSafeEqual } from 'node:crypto';
 import axios from 'axios';
+import { PRODUCT_NAME } from '../core/kernel/product';
 
 
 /**
@@ -314,7 +315,7 @@ export class PlatformService implements OnModuleDestroy {
         // The verifier identifies itself by DID so a wallet can resolve our key and check
         // the request object's signature without a PKI or a network round-trip.
         clientId: defaultCfg?.credential.issuerDid ?? 'did:web:openresidency.example',
-        clientName: defaultCfg?.credential.issuerName ?? 'OpenResidency Verifier',
+        clientName: defaultCfg?.credential.issuerName ?? `${PRODUCT_NAME} Verifier`,
         requestTtlSeconds: defaultCfg?.presentation.requestTtlSeconds ?? 300,
         query: defaultCfg?.presentation.query ?? ['dcql', 'presentation_definition'],
       },
@@ -340,7 +341,7 @@ export class PlatformService implements OnModuleDestroy {
     // be enrolled for a resident whose one-time code or presentation the caller completed.
     const base = new URL(this.publicBaseUrl());
     this.webauthn = new WebAuthnService(
-      { rpId: base.hostname, origin: base.origin, rpName: defaultCfg?.credential.issuerName ?? 'OpenResidency' },
+      { rpId: base.hostname, origin: base.origin, rpName: defaultCfg?.credential.issuerName ?? PRODUCT_NAME },
       this.webauthnChallengeStore,
       this.webauthnCredentialStore,
     );
@@ -392,7 +393,7 @@ export class PlatformService implements OnModuleDestroy {
     // on the state's behalf should name the state in `dataProtection.controller`.
     const dpCfg = this.listConfigs()[0];
     const controller =
-      dpCfg?.dataProtection.controller ?? dpCfg?.credential.issuerName ?? 'OpenResidency';
+      dpCfg?.dataProtection.controller ?? dpCfg?.credential.issuerName ?? PRODUCT_NAME;
     this.legalBasisRegistry = new LegalBasisRegistry(
       legalBasesForDeployment({
         jurisdiction: dpCfg?.countryName ?? 'unspecified',

@@ -81,13 +81,13 @@ async function bootstrap() {
         health: 'GET  /health/live, /health/ready',
       },
     },
-    'OpenResidency listening',
+    'OpnResidex listening',
   );
 }
 
 bootstrap().catch((err: unknown) => {
   // A boot refusal -- no pepper, no issuer key, a missing relying-party secret -- must be
   // legible in the same log stream as everything else, not a bare stack on stderr.
-  createRootLogger().fatal({ err }, 'OpenResidency failed to start');
+  createRootLogger().fatal({ err }, 'OpnResidex failed to start');
   process.exit(1);
 });

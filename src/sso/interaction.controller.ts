@@ -343,7 +343,7 @@ export class InteractionController {
     await this.provider.interactionFinished(
       req,
       res,
-      { error: 'access_denied', error_description: 'Citizen aborted the flow' },
+      { error: 'access_denied', error_description: 'The resident cancelled the sign-in' },
       { mergeWithLastSubmission: false },
     );
   }

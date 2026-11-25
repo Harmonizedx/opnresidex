@@ -29,8 +29,20 @@ What does not change, because other systems depend on the exact value: the npm p
 credential context `https://openresidency.org/contexts/residency/v1` and its vocabulary, which
 are signed into every credential; the `urn:openresidency:aal1` to `aal3` sign-in values; the
 `openres:` QR prefixes; the `openresidency_*` metric names; and the Helm chart, Kubernetes
-resource names and source archive name. Messages a deployment sends still default to the
-issuer name "OpenResidency" where `credential.issuerName` is not set.
+resource names and source archive name.
+
+**The fallback name is OpnResidex too.** Where a deployment supplies no name of its own, the
+software used to call itself "OpenResidency": in the entry an operator's authenticator app
+shows (`operatorAuth.issuerName`), in a one-time-code message and the USSD menu header when no
+jurisdiction config is loaded, in the passkey prompt, and in the title of the API documentation
+page. Those now say "OpnResidex". A deployment that sets `credential.issuerName` and
+`operatorAuth.issuerName` sees no change. An operator who enrols an authenticator after
+upgrading gets an entry under the new name; existing entries keep working and keep their old
+label. Passkeys are bound to the hostname, not to this name, and are unaffected. The SDK's
+`OpenResidencyError` message reads "OpnResidex API error <status>"; code that matches on
+`status` is unaffected. A cancelled sign-in returns `error_description: "The resident
+cancelled the sign-in"` in place of "Citizen aborted the flow"; the `error` code is still
+`access_denied`.
 
 ### Added
 

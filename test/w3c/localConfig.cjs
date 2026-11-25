@@ -21,8 +21,8 @@ module.exports = {
   },
   implementations: [
     {
-      name: 'OpenResidency',
-      implementation: 'OpenResidency',
+      name: 'OpnResidex',
+      implementation: 'OpnResidex',
       issuers: [
         {
           id: 'did:web:id.katsina.gov.ng',
