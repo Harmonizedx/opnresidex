@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
+import { PRODUCT_NAME } from '../kernel/product';
+
 /**
  * USSD state machine for feature phones (no smartphone, no data plan).
  *
@@ -43,7 +45,7 @@ export function handleUssd(text: string): UssdResult {
     return {
       continueSession: true,
       message: [
-        'OpenResidency',
+        PRODUCT_NAME,
         '1. Check my residency status',
         '2. Get a login code',
         '3. Who has looked at my record',

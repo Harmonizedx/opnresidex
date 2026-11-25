@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { ContactDirectory, MessagingProvider, maskPhone } from './types';
 import type { OtpSender } from '../sso/otp';
+import { PRODUCT_NAME } from '../kernel/product';
 
 /**
  * The OtpSender the platform actually wires: resolve the resident's number through the
@@ -24,7 +25,7 @@ export class MessagingOtpSender implements OtpSender {
     private provider: MessagingProvider,
     private directory: ContactDirectory,
     private messageTemplate = 'Your {issuer} sign-in code is {code}. It expires in 5 minutes. Do not share it.',
-    private issuerName = 'OpenResidency',
+    private issuerName = PRODUCT_NAME,
   ) {}
 
   async send(residentId: string, code: string): Promise<{ channel: string }> {

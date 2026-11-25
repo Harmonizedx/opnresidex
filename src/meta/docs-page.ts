@@ -36,7 +36,7 @@ const SWAGGER_JS = {
 export function docsPage(): string {
   return `<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>OpenResidency API</title>
+<title>OpnResidex API</title>
 <link rel="stylesheet" href="${SWAGGER_CSS.url}" integrity="${SWAGGER_CSS.sri}" crossorigin="anonymous">
 </head><body>
 <div id="swagger"></div>

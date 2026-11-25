@@ -7,6 +7,7 @@ import { OperatorService } from '../core/operator/operator';
 import { FederatedOperatorVerifier } from '../core/operator/federated';
 import { OperatorSessions } from '../core/operator/session';
 import { PrismaOperatorStore } from '../prisma/prisma.service';
+import { PRODUCT_NAME } from '../core/kernel/product';
 
 /**
  * Everything the OperatorGuard needs to authenticate a member of staff, assembled once at
@@ -87,7 +88,7 @@ export class OperatorIdentity {
 
   private build(cfg?: CountryConfig): OperatorAuthContext {
     const stated = cfg?.operatorAuth ?? {
-      issuerName: 'OpenResidency',
+      issuerName: PRODUCT_NAME,
       local: { requireMfa: true, sessionTtlSeconds: 8 * 3600 },
     };
     const conf = { ...stated, mode: this.resolveMode(cfg?.operatorAuth?.mode) };

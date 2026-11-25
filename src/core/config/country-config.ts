@@ -8,6 +8,7 @@ import { ATTESTER_TYPES, AttesterType } from '../proofing/residence';
 import { CONSENT_LEGAL_BASIS_ID } from '../consent/legal-basis';
 import { LEGACY_SUITES } from '../credentials/ld-suites';
 import { loadSubdivisionTable, unitCodeWarnings } from './iso3166-2';
+import { PRODUCT_NAME } from '../kernel/product';
 
 /**
  * A country configuration is the single source of truth for onboarding a new
@@ -753,7 +754,7 @@ export type UpstreamOidcProfile = z.infer<typeof upstreamOidcSchema>;
 const operatorAuthSchema = z.object({
   mode: z.enum(['oidc', 'local', 'sharedKey']).optional(),
   /** Issuer name shown in operators' authenticator apps. */
-  issuerName: z.string().default('OpenResidency'),
+  issuerName: z.string().default(PRODUCT_NAME),
   oidc: z
     .object({
       issuer: z.string(),

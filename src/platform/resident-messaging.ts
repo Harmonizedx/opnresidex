@@ -11,6 +11,7 @@ import {
   NullContactDirectory,
 } from '../core/messaging/contact-directory';
 import { PrismaResidencyStore } from '../prisma/prisma.service';
+import { PRODUCT_NAME } from '../core/kernel/product';
 
 /**
  * Reaching a resident: which aggregator carries the message, and how a residentId becomes a
@@ -124,7 +125,7 @@ export class ResidentMessaging {
       provider,
       contacts,
       cfg?.messaging?.otpTemplate,
-      cfg?.credential.issuerName ?? 'OpenResidency',
+      cfg?.credential.issuerName ?? PRODUCT_NAME,
     );
   }
 
