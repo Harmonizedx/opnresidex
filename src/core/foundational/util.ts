@@ -131,11 +131,17 @@ export function parseXml(
 
   // CDATA can contain <, >, & -- escape its payload to entities so the tag scanner
   // below never sees stray markup, then decodeEntities restores it as text.
-  const cleaned = xml
+  // Comments are removed until none is left. One pass over `<!-<!-- a -->- b -->` deletes
+  // the inner comment and, in doing so, assembles a new opener from the pieces around it.
+  let withoutComments = xml
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, (_m, c: string) => escapeText(c))
-    .replace(/<\?[\s\S]*?\?>/g, '')
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<!DOCTYPE[^>]*>/gi, '');
+    .replace(/<\?[\s\S]*?\?>/g, '');
+  let before: string;
+  do {
+    before = withoutComments;
+    withoutComments = withoutComments.replace(/<!--[\s\S]*?-->/g, '');
+  } while (withoutComments !== before);
+  const cleaned = withoutComments.replace(/<!DOCTYPE[^>]*>/gi, '');
 
   interface Node {
     children: Record<string, unknown>;

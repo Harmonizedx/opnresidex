@@ -37,7 +37,7 @@ export class MessagingOtpSender implements OtpSender {
       // The id is caller-supplied on some paths, so it is URL-encoded before it reaches a
       // log line: no line break or control character can forge an entry, and a well-formed
       // id (letters, digits, hyphens) is unchanged and legible to the operator reading it.
-      const safeId = encodeURIComponent(String(residentId)).slice(0, 64);
+      const safeId = encodeURIComponent(String(residentId).replace(/\n|\r/g, '')).slice(0, 64);
       // eslint-disable-next-line no-console
       console.warn(
         `[otp] No contact number for resident ${safeId}; one-time code not sent. ` +

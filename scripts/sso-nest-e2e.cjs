@@ -21,7 +21,7 @@
  */
 require('reflect-metadata');
 const http = require('node:http');
-const { writeFileSync, mkdirSync, rmSync } = require('node:fs');
+const { writeFileSync, mkdtempSync, rmSync } = require('node:fs');
 const { join } = require('node:path');
 const { tmpdir } = require('node:os');
 const { createHash, randomBytes, generateKeyPairSync, sign: edSign } = require('node:crypto');
@@ -201,8 +201,7 @@ async function main() {
   const mockBase = `http://127.0.0.1:${mockPort}`;
 
   // --- Country config dir pointing contact + SMS at the mock ---------------
-  const cfgDir = join(tmpdir(), `ors-e2e-cfg-${process.pid}`);
-  mkdirSync(cfgDir, { recursive: true });
+  const cfgDir = mkdtempSync(join(tmpdir(), 'ors-e2e-cfg-'));
   writeFileSync(
     join(cfgDir, 'zz.yaml'),
     `countryCode: ZZ
