@@ -4,7 +4,7 @@ info:
   version: 0.3.0
   description: >
     Open-source subnational trust infrastructure for verified, purpose-scoped jurisdictional
-    relationships between residents and their jurisdictions, giving citizens inclusive,
+    relationships between residents and their jurisdictions, giving them inclusive,
     privacy-preserving access to public services. Binds any national foundational ID to a W3C
     Verifiable Credential, federates cross-sector access, and records consent and a
     tamper-evident audit trail. The raw national ID is never stored or returned; only a
@@ -49,7 +49,7 @@ tags:
   - name: oid4vci
     description: >
       OpenID for Verifiable Credential Issuance. The standards-based path by which a
-      citizen's own wallet (Inji, or any OpenWallet-compatible wallet) obtains a
+      resident's own wallet (Inji, or any OpenWallet-compatible wallet) obtains a
       residency credential bound to a key on their device. Both OpenID4VCI 1.0 and
       Draft 13 request/response shapes are accepted; the response matches the dialect
       of the request.
@@ -60,7 +60,7 @@ tags:
   - name: oid4vp
     description: >
       OpenID for Verifiable Presentations. The standards-based path by which a relying
-      party -- a clinic, a subsidy desk, a bank -- asks a citizen's wallet to present the
+      party -- a clinic, a subsidy desk, a bank -- asks a resident's wallet to present the
       residency credential, and gets back a verdict it did not have to integrate anything
       OpnResidex-specific to obtain. Requests are signed, single-use, and short-lived;
       the wallet posts back with `response_mode: direct_post`.
@@ -70,7 +70,7 @@ tags:
       W3C test suites drive an implementation through, exposed so a reviewer can point
       `w3c/vc-data-model-2.0-test-suite` at a running instance. It is NOT how residency
       credentials are issued in production -- that is OpenID4VCI, which binds the
-      credential to the citizen's wallet key -- and it will sign more or less whatever it
+      credential to the resident's wallet key -- and it will sign more or less whatever it
       is handed, so every route is operator-guarded (registrar role).
   - name: trust
     description: >
@@ -322,7 +322,7 @@ paths:
         Destroys every identifying field on the record (names, date of birth, gender, contact
         details, and the tokenized reference linking it to a foundational identity) and
         redacts the subject from the audit log. The credential is revoked FIRST, so what the
-        citizen holds is dead before its subject becomes unidentifiable.
+        resident holds is dead before its subject becomes unidentifiable.
 
 
         Audit events are redacted, not deleted: rows and hashes remain so the tamper-evident
@@ -2472,7 +2472,7 @@ paths:
       summary: Authorization Server Metadata (RFC 8414)
       description: >
         Only the pre-authorized code grant is supported. There is no interactive
-        authorization-code flow, because the citizen was already authenticated in person
+        authorization-code flow, because the resident was already authenticated in person
         against their foundational ID at the enrollment desk. The same document is also
         served at `/.well-known/openid-configuration` for wallets that look there first.
       responses:
@@ -2489,7 +2489,7 @@ paths:
       description: >
         Called by the enrollment desk after the foundational ID check has passed. Returns
         an `openid-credential-offer://` deep link to render as a QR, and a transaction
-        code of the configured length (default 6 digits) to read out to the citizen.
+        code of the configured length (default 6 digits) to read out to the resident.
         Requires the `registrar` role: being able to mint offers for arbitrary residents
         is equivalent to being able to issue their credentials.
 
@@ -2786,10 +2786,10 @@ paths:
       description: >
         Relying-party action; requires the `support` role. Creates a pending presentation
         request with a fresh nonce and returns the deep link the relying party shows the
-        citizen. The request is passed BY REFERENCE (OpenID4VP 1.0 §5.10, `request_uri`):
+        resident. The request is passed BY REFERENCE (OpenID4VP 1.0 §5.10, `request_uri`):
         the URI carries only `client_id` and `request_uri`, and the wallet fetches the
         signed Request Object from GET /openid4vp/request/{id}. Signing is what lets the
-        wallet tell the citizen who is really asking.
+        wallet tell the resident who is really asking.
 
 
         Guarded because whoever can open a request can later read its outcome, and the
@@ -2817,7 +2817,7 @@ paths:
       tags: [oid4vp]
       summary: The signed Request Object a wallet dereferences from request_uri
       description: >
-        Wallet action; unauthenticated by necessity (the wallet is on the citizen's device),
+        Wallet action; unauthenticated by necessity (the wallet is on the resident's device),
         protected instead by the id being an unguessable UUID that expires. Returns the
         Request Object as a compact JWS with header `typ: oauth-authz-req+jwt` (JAR,
         RFC 9101 §4; OpenID4VP 1.0 §5.10) in the `application/oauth-authz-req+jwt` media type.
@@ -3151,7 +3151,7 @@ paths:
       tags: [sso]
       summary: The sign-in or consent page for an OIDC interaction
       description: >
-        Browser-only. A relying party sends the citizen to the OpenID Connect provider's
+        Browser-only. A relying party sends the resident to the OpenID Connect provider's
         authorization endpoint (`GET /oidc/auth`); when the provider needs a human step it
         mints an interaction `uid`, sets its `_interaction` cookie, and redirects the browser
         here. Renders the sign-in page for a `login` prompt (wallet QR plus a one-time-code
@@ -3182,7 +3182,7 @@ paths:
       summary: Begin a wallet (Verifiable Presentation) sign-in
       description: >
         Called by the sign-in page's script. Creates an OpenID4VP presentation request and
-        returns its URI and an SVG QR of it for the citizen's wallet to scan. The `uid` is
+        returns its URI and an SVG QR of it for the resident's wallet to scan. The `uid` is
         not consulted and no interaction cookie is required; the `requestId` returned is the
         capability that later completes the sign-in.
       security: []
@@ -3247,7 +3247,7 @@ paths:
       tags: [sso]
       summary: Send a one-time code to a residency ID's registered contact
       description: >
-        The fallback factor, for a citizen whose wallet is not to hand. Answers `sent: true`
+        The fallback factor, for a resident whose wallet is not to hand. Answers `sent: true`
         whether or not the residency ID exists, was supplied, or could be reached, so it
         cannot be used to enumerate residency IDs; a delivery failure is written to the
         audit log instead. Neither `uid` nor the interaction cookie is checked. Also the
@@ -3890,7 +3890,7 @@ components:
           type: string
           enum:
             [sso_consent_screen, operator_recorded, signed_form, ussd_confirmation, imported_record]
-          description: How the citizen's agreement was captured.
+          description: How the resident's agreement was captured.
         evidenceReference:
           type: string
           example: 'interaction:abc123'
@@ -3944,7 +3944,7 @@ components:
         withdrawnBy:
           type: string
           nullable: true
-          description: Who withdrew it — the citizen, or an operator acting on their request.
+          description: Who withdrew it — the resident, or an operator acting on their request.
         grantId:
           type: string
           nullable: true
@@ -4032,7 +4032,7 @@ components:
         purpose:
           type: string
           maxLength: 512
-          description: Shown to the citizen in the wallet's consent screen. Defaults to "Confirm state residency".
+          description: Shown to the resident in the wallet's consent screen. Defaults to "Confirm state residency".
           example: Confirm residency for a maternal health subsidy
         reference:
           type: string
@@ -5225,7 +5225,7 @@ components:
                         description: { type: string }
         txCode:
           type: string
-          description: Read out to the citizen. Returned once; stored only as a hash.
+          description: Read out to the resident. Returned once; stored only as a hash.
           example: '402913'
         expiresAt: { type: string, format: date-time }
         credentialConfigurationIds:

@@ -539,7 +539,7 @@ export interface paths {
         put?: never;
         /**
          * Erase a resident's personal data
-         * @description Destroys every identifying field on the record (names, date of birth, gender, contact details, and the tokenized reference linking it to a foundational identity) and redacts the subject from the audit log. The credential is revoked FIRST, so what the citizen holds is dead before its subject becomes unidentifiable.
+         * @description Destroys every identifying field on the record (names, date of birth, gender, contact details, and the tokenized reference linking it to a foundational identity) and redacts the subject from the audit log. The credential is revoked FIRST, so what the resident holds is dead before its subject becomes unidentifiable.
          *
          *     Audit events are redacted, not deleted: rows and hashes remain so the tamper-evident chain still verifies, and each redaction is appended as its own chained event naming who performed it and under what authority. The response reports whether the chain is still intact, so a data protection officer signing off a deletion need not take that on trust.
          *
@@ -4684,7 +4684,7 @@ export interface paths {
         };
         /**
          * Authorization Server Metadata (RFC 8414)
-         * @description Only the pre-authorized code grant is supported. There is no interactive authorization-code flow, because the citizen was already authenticated in person against their foundational ID at the enrollment desk. The same document is also served at `/.well-known/openid-configuration` for wallets that look there first.
+         * @description Only the pre-authorized code grant is supported. There is no interactive authorization-code flow, because the resident was already authenticated in person against their foundational ID at the enrollment desk. The same document is also served at `/.well-known/openid-configuration` for wallets that look there first.
          */
         get: {
             parameters: {
@@ -4725,7 +4725,7 @@ export interface paths {
         put?: never;
         /**
          * Create a Credential Offer for an enrolled resident (operator; registrar role)
-         * @description Called by the enrollment desk after the foundational ID check has passed. Returns an `openid-credential-offer://` deep link to render as a QR, and a transaction code of the configured length (default 6 digits) to read out to the citizen. Requires the `registrar` role: being able to mint offers for arbitrary residents is equivalent to being able to issue their credentials.
+         * @description Called by the enrollment desk after the foundational ID check has passed. Returns an `openid-credential-offer://` deep link to render as a QR, and a transaction code of the configured length (default 6 digits) to read out to the resident. Requires the `registrar` role: being able to mint offers for arbitrary residents is equivalent to being able to issue their credentials.
          *     The offer is passed BY VALUE: the pre-authorized code travels inside the QR, and only its SHA-256 hash is stored. A photographed QR is not sufficient on its own, because the transaction code is a separate factor, the code is single-use, and it expires after `wallet.offer.ttlSeconds` (default 15 minutes).
          *     Recorded to the audit log as `oid4vci.offer.create` with the offer id only -- never the pre-authorized code or the transaction code.
          */
@@ -5189,7 +5189,7 @@ export interface paths {
         put?: never;
         /**
          * Open a presentation request and get an openid4vp:// URI to render as a QR
-         * @description Relying-party action; requires the `support` role. Creates a pending presentation request with a fresh nonce and returns the deep link the relying party shows the citizen. The request is passed BY REFERENCE (OpenID4VP 1.0 §5.10, `request_uri`): the URI carries only `client_id` and `request_uri`, and the wallet fetches the signed Request Object from GET /openid4vp/request/{id}. Signing is what lets the wallet tell the citizen who is really asking.
+         * @description Relying-party action; requires the `support` role. Creates a pending presentation request with a fresh nonce and returns the deep link the relying party shows the resident. The request is passed BY REFERENCE (OpenID4VP 1.0 §5.10, `request_uri`): the URI carries only `client_id` and `request_uri`, and the wallet fetches the signed Request Object from GET /openid4vp/request/{id}. Signing is what lets the wallet tell the resident who is really asking.
          *
          *     Guarded because whoever can open a request can later read its outcome, and the outcome carries residency claims. The request expires after `presentation.requestTtlSeconds` (default 300 s).
          */
@@ -5253,7 +5253,7 @@ export interface paths {
         };
         /**
          * The signed Request Object a wallet dereferences from request_uri
-         * @description Wallet action; unauthenticated by necessity (the wallet is on the citizen's device), protected instead by the id being an unguessable UUID that expires. Returns the Request Object as a compact JWS with header `typ: oauth-authz-req+jwt` (JAR, RFC 9101 §4; OpenID4VP 1.0 §5.10) in the `application/oauth-authz-req+jwt` media type. The `kid` is `<client_id>#<issuer key id>`, so a wallet resolves the verifier's DID to check the signature with no PKI.
+         * @description Wallet action; unauthenticated by necessity (the wallet is on the resident's device), protected instead by the id being an unguessable UUID that expires. Returns the Request Object as a compact JWS with header `typ: oauth-authz-req+jwt` (JAR, RFC 9101 §4; OpenID4VP 1.0 §5.10) in the `application/oauth-authz-req+jwt` media type. The `kid` is `<client_id>#<issuer key id>`, so a wallet resolves the verifier's DID to check the signature with no PKI.
          *
          *     Claims, exactly as emitted: `client_id`, `response_type: vp_token`, `response_mode: direct_post`, `response_uri` (POST /openid4vp/response/{id}), `nonce`, `state` (the request id), `client_metadata` (`client_name`, `purpose`), `iss` (the client_id), `aud: https://self-issued.me/v2`, `iat`, `exp`. The query is emitted in whichever languages the deployment advertises (`presentation.query`, default both): `dcql_query` (OpenID4VP 1.0 §6, one credential query with id `residency`, `format: ldp_vc`, `meta.type_values`, and `claims` paths for `credentialSubject.residentId` and `credentialSubject.subnationalUnit.{name,code}`) and/or `presentation_definition` (DIF Presentation Exchange, one input descriptor `residency` constrained on `$.type` / `$.vc.type` containing the credential type).
          */
@@ -5747,7 +5747,7 @@ export interface paths {
         };
         /**
          * The sign-in or consent page for an OIDC interaction
-         * @description Browser-only. A relying party sends the citizen to the OpenID Connect provider's authorization endpoint (`GET /oidc/auth`); when the provider needs a human step it mints an interaction `uid`, sets its `_interaction` cookie, and redirects the browser here. Renders the sign-in page for a `login` prompt (wallet QR plus a one-time-code fallback) or the consent page for a `consent` prompt, under a per-response Content-Security-Policy that permits only nonced inline script and style. The interaction is resolved from the cookie, not from the path: a valid cookie is what authorises the page.
+         * @description Browser-only. A relying party sends the resident to the OpenID Connect provider's authorization endpoint (`GET /oidc/auth`); when the provider needs a human step it mints an interaction `uid`, sets its `_interaction` cookie, and redirects the browser here. Renders the sign-in page for a `login` prompt (wallet QR plus a one-time-code fallback) or the consent page for a `consent` prompt, under a per-response Content-Security-Policy that permits only nonced inline script and style. The interaction is resolved from the cookie, not from the path: a valid cookie is what authorises the page.
          */
         get: {
             parameters: {
@@ -5798,7 +5798,7 @@ export interface paths {
         };
         /**
          * Begin a wallet (Verifiable Presentation) sign-in
-         * @description Called by the sign-in page's script. Creates an OpenID4VP presentation request and returns its URI and an SVG QR of it for the citizen's wallet to scan. The `uid` is not consulted and no interaction cookie is required; the `requestId` returned is the capability that later completes the sign-in.
+         * @description Called by the sign-in page's script. Creates an OpenID4VP presentation request and returns its URI and an SVG QR of it for the resident's wallet to scan. The `uid` is not consulted and no interaction cookie is required; the `requestId` returned is the capability that later completes the sign-in.
          */
         get: {
             parameters: {
@@ -5945,7 +5945,7 @@ export interface paths {
         put?: never;
         /**
          * Send a one-time code to a residency ID's registered contact
-         * @description The fallback factor, for a citizen whose wallet is not to hand. Answers `sent: true` whether or not the residency ID exists, was supplied, or could be reached, so it cannot be used to enumerate residency IDs; a delivery failure is written to the audit log instead. Neither `uid` nor the interaction cookie is checked. Also the authorisation step for passkey enrolment (see /webauthn/register/start).
+         * @description The fallback factor, for a resident whose wallet is not to hand. Answers `sent: true` whether or not the residency ID exists, was supplied, or could be reached, so it cannot be used to enumerate residency IDs; a delivery failure is written to the audit log instead. Neither `uid` nor the interaction cookie is checked. Also the authorisation step for passkey enrolment (see /webauthn/register/start).
          */
         post: {
             parameters: {
@@ -6721,7 +6721,7 @@ export interface components {
              */
             dataCategories: string[];
             /**
-             * @description How the citizen's agreement was captured.
+             * @description How the resident's agreement was captured.
              * @enum {string}
              */
             evidenceMethod: "sso_consent_screen" | "operator_recorded" | "signed_form" | "ussd_confirmation" | "imported_record";
@@ -6767,7 +6767,7 @@ export interface components {
             version: number;
             supersedesId?: string | null;
             supersededById?: string | null;
-            /** @description Who withdrew it — the citizen, or an operator acting on their request. */
+            /** @description Who withdrew it — the resident, or an operator acting on their request. */
             withdrawnBy?: string | null;
             /** @description The OIDC grant this consent authorized, when it was created through the SSO consent step. Revoking the consent destroys the grant and its tokens. Absent for consents granted directly over this API. */
             grantId?: string | null;
@@ -6840,7 +6840,7 @@ export interface components {
         /** @description Both fields optional; unknown properties are rejected. */
         PresentationRequestCreate: {
             /**
-             * @description Shown to the citizen in the wallet's consent screen. Defaults to "Confirm state residency".
+             * @description Shown to the resident in the wallet's consent screen. Defaults to "Confirm state residency".
              * @example Confirm residency for a maternal health subsidy
              */
             purpose?: string;
@@ -7954,7 +7954,7 @@ export interface components {
                 };
             };
             /**
-             * @description Read out to the citizen. Returned once; stored only as a hash.
+             * @description Read out to the resident. Returned once; stored only as a hash.
              * @example 402913
              */
             txCode?: string;
