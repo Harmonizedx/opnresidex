@@ -46,7 +46,7 @@ cancelled the sign-in"` in place of "Citizen aborted the flow"; the `error` code
 
 ### Fixed
 
-**Four findings from code scanning.**
+**Findings from code scanning.**
 
 - Resident IDs are drawn uniformly. Each character was a random byte reduced modulo the
   alphabet's length, which favours the first characters of any alphabet whose length does not
@@ -61,6 +61,13 @@ cancelled the sign-in"` in place of "Citizen aborted the flow"; the `error` code
   missing field is now recorded with the verifier's own reason, not `MISSING_FIELDS`.
 - The warning logged when a resident has no contact number strips line breaks from the id
   before it is written.
+- The operator guard asks each verifier with whatever was presented, an absent credential
+  being an empty one, and the credential-issuance endpoint makes one authorization decision
+  against the access token. Who is let in is unchanged: a refused operator key still ends the
+  request, and the error codes are the same. A request without an operator key now costs one
+  extra indexed lookup.
+- A delivered one-time code is no longer logged with the masked phone number and the
+  provider's message id. The log line says only that a code was handed to the provider.
 
 ### Added
 

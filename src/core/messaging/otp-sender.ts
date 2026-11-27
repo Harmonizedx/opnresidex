@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-import { ContactDirectory, MessagingProvider, maskPhone } from './types';
+import { ContactDirectory, MessagingProvider } from './types';
 import type { OtpSender } from '../sso/otp';
 import { PRODUCT_NAME } from '../kernel/product';
 
@@ -51,11 +51,11 @@ export class MessagingOtpSender implements OtpSender {
       .replace(/\{issuer\}/g, this.issuerName);
 
     const result = await this.provider.send({ to, body, kind: 'otp' });
+    // Nothing about the message is logged here: not the number, masked or otherwise, and
+    // not the provider's id for it. The channel goes back to the caller, and the delivery
+    // itself is the provider's record.
     // eslint-disable-next-line no-console
-    console.log(
-      `[otp] code delivered to ${maskPhone(to)} via ${result.channel}` +
-        (result.providerMessageId ? ` (id ${result.providerMessageId})` : ''),
-    );
+    console.log('[otp] one-time code handed to the messaging provider');
     return { channel: result.channel };
   }
 }

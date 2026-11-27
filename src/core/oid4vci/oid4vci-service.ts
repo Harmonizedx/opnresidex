@@ -567,16 +567,14 @@ export class Oid4vciService {
       request.configurationId ??
       token.configurationIds.find((id) => this.parseConfigurationId(id)?.format === request.format);
 
-    if (!configurationId) {
+    // One decision, made against what the token carries: the request names a configuration
+    // the token authorizes, or it is refused. Which refusal is a matter of wording only.
+    if (configurationId === undefined || !token.configurationIds.includes(configurationId)) {
       throw new Oid4vciError(
-        'unknown_credential_configuration',
-        `no credential configuration matches format '${request.format ?? '(none)'}'`,
-      );
-    }
-    if (!token.configurationIds.includes(configurationId)) {
-      throw new Oid4vciError(
-        'credential_request_denied',
-        'this access token does not authorize that credential configuration',
+        configurationId === undefined ? 'unknown_credential_configuration' : 'credential_request_denied',
+        configurationId === undefined
+          ? `no credential configuration matches format '${request.format ?? '(none)'}'`
+          : 'this access token does not authorize that credential configuration',
       );
     }
 
