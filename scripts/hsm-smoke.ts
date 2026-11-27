@@ -15,7 +15,7 @@
  * Set SOFTHSM2_CONF and PKCS11_LIBRARY to point at a token, or let it discover the
  * usual Homebrew/Linux install locations.
  */
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -88,7 +88,7 @@ function ensureToken(pin: string): { ok: true; label: string } | { ok: false; wh
     return { ok: false, why: 'softhsm2-util is not installed' };
   }
 
-  const dir = join(tmpdir(), `openresidency-hsm-${process.pid}`);
+  const dir = mkdtempSync(join(tmpdir(), 'openresidency-hsm-'));
   const tokens = join(dir, 'tokens');
   mkdirSync(tokens, { recursive: true });
   const conf = join(dir, 'softhsm2.conf');

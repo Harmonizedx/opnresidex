@@ -44,6 +44,31 @@ label. Passkeys are bound to the hostname, not to this name, and are unaffected.
 cancelled the sign-in"` in place of "Citizen aborted the flow"; the `error` code is still
 `access_denied`.
 
+### Fixed
+
+**Findings from code scanning.**
+
+- Resident IDs are drawn uniformly. Each character was a random byte reduced modulo the
+  alphabet's length, which favours the first characters of any alphabet whose length does not
+  divide 256: the numeric and base-36 formats, and a jurisdiction's own alphabet. The default
+  32-character format was not affected. IDs already issued are unchanged and still validate.
+- The XML reader for foundational sources removes comments until none is left. A single pass
+  over `<!-<!-- a -->- … -->` deleted the inner comment and left a new one, whose contents were
+  then read as elements. A foundational source would have had to send such a response.
+- The sign-in endpoints for one-time codes and passkeys call their verifier with whatever was
+  supplied. They used to skip it when a field was missing; the outcome was the same refusal,
+  but a check the caller can switch off is the shape that goes wrong later. A sign-in with a
+  missing field is now recorded with the verifier's own reason, not `MISSING_FIELDS`.
+- The warning logged when a resident has no contact number strips line breaks from the id
+  before it is written.
+- The operator guard asks each verifier with whatever was presented, an absent credential
+  being an empty one, and the credential-issuance endpoint makes one authorization decision
+  against the access token. Who is let in is unchanged: a refused operator key still ends the
+  request, and the error codes are the same. A request without an operator key now costs one
+  extra indexed lookup.
+- A delivered one-time code is no longer logged with the masked phone number and the
+  provider's message id. The log line says only that a code was handed to the provider.
+
 ### Added
 
 **Arrival notices between federated jurisdictions, under a declared exclusivity rule.** When a

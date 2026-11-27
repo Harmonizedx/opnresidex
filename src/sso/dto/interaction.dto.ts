@@ -17,7 +17,7 @@ export class AuthStartDto {
   residentId?: string;
 }
 
-/** Body for `otp/verify`. Both fields optional so the controller keeps its own MISSING_FIELDS handling. */
+/** Body for `otp/verify`. Both fields optional: a missing one is a code that does not verify. */
 export class OtpVerifyDto {
   @IsOptional()
   @IsString()

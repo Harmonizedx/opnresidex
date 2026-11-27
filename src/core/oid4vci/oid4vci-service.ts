@@ -563,20 +563,23 @@ export class Oid4vciService {
     // Resolve which credential configuration is being asked for, and check the token
     // actually authorizes it -- a token minted for one offer must not be usable to mint
     // some other country's credential.
-    const configurationId =
-      request.configurationId ??
-      token.configurationIds.find((id) => this.parseConfigurationId(id)?.format === request.format);
+    //
+    // The configuration is chosen FROM the token's own list, by the request: the one it
+    // names, or failing a name, the one in the format it asks for. What comes out is either
+    // something the token authorizes or nothing, so the request can select among what was
+    // granted and cannot supply an id of its own.
+    const configurationId = token.configurationIds.find((id) =>
+      request.configurationId !== undefined
+        ? id === request.configurationId
+        : this.parseConfigurationId(id)?.format === request.format,
+    );
 
-    if (!configurationId) {
+    if (configurationId === undefined) {
       throw new Oid4vciError(
-        'unknown_credential_configuration',
-        `no credential configuration matches format '${request.format ?? '(none)'}'`,
-      );
-    }
-    if (!token.configurationIds.includes(configurationId)) {
-      throw new Oid4vciError(
-        'credential_request_denied',
-        'this access token does not authorize that credential configuration',
+        request.configurationId !== undefined ? 'credential_request_denied' : 'unknown_credential_configuration',
+        request.configurationId !== undefined
+          ? 'this access token does not authorize that credential configuration'
+          : `no credential configuration matches format '${request.format ?? '(none)'}'`,
       );
     }
 

@@ -99,23 +99,29 @@ export class OperatorGuard implements CanActivate {
 
     // Per-operator API keys work in every mode: they are how kiosks and batch jobs
     // authenticate, and they carry an identity and an expiry unlike the shared key.
+    //
+    // Every verifier below is asked with whatever was presented, an absent credential being
+    // the empty string, and only its answer decides. Nothing the caller sends chooses
+    // whether a check runs: no stored key hashes from the empty string, and an empty token
+    // is a token that does not verify.
     const presentedKey =
-      (token?.startsWith('ork_') ? token : undefined) ??
-      (String(req.headers['x-operator-key'] ?? '') || undefined);
-    if (presentedKey) {
-      return auth.operators.authenticateKey(presentedKey);
-    }
+      (token?.startsWith('ork_') ? token : undefined) ?? String(req.headers['x-operator-key'] ?? '');
+    const byKey = await auth.operators.authenticateKey(presentedKey);
+    if (byKey) return byKey;
+    // A key that was presented and refused is the end of it. Falling through would let a
+    // revoked or expired key be covered for by a second credential on the same request.
+    if (presentedKey !== '') return null;
 
-    if (auth.mode === 'oidc' && token) {
+    if (auth.mode === 'oidc') {
       if (!auth.federated) return null;
-      const claims = await auth.federated.verify(token);
+      const claims = await auth.federated.verify(token ?? '');
       if (!claims) return null;
       return auth.operators.resolveFederated(claims);
     }
 
-    if (auth.mode === 'local' && token) {
+    if (auth.mode === 'local') {
       if (!auth.sessions) return null;
-      const session = await auth.sessions.verify(token);
+      const session = await auth.sessions.verify(token ?? '');
       if (!session) return null;
       return auth.operators.resolveSession(session.operatorId);
     }

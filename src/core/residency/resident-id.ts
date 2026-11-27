@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-import { createHash, randomBytes } from 'node:crypto';
+import { createHash, randomInt } from 'node:crypto';
 
 /**
  * Human-facing Residency ID.
@@ -151,9 +151,11 @@ export function generateResidentId(
 ): string {
   const alphabet = alphabetOf(format);
   const total = format.groups.reduce((a, b) => a + b, 0);
-  const bytes = randomBytes(total);
+  // `randomInt` draws uniformly over the alphabet. A random byte reduced modulo the length
+  // does not, unless the length divides 256: with a 10- or 36-character alphabet, or a
+  // jurisdiction's own, the first few characters came up more often than the rest.
   let raw = '';
-  for (let i = 0; i < total; i++) raw += alphabet[bytes[i] % alphabet.length];
+  for (let i = 0; i < total; i++) raw += alphabet[randomInt(alphabet.length)];
 
   const segments: string[] = [];
   let k = 0;

@@ -104,17 +104,18 @@ export class InteractionController {
    */
   @Post(':uid/otp/start')
   async otpStart(@Body() body: AuthStartDto) {
-    if (body?.residentId) {
-      try {
-        await this.platform.getSsoAuth().beginOtpLogin(body.residentId);
-      } catch (e) {
-        await this.platform.getAudit().record({
-          action: 'sso.login',
-          actor: body.residentId,
-          outcome: 'failure',
-          metadata: { factor: 'otp', stage: 'delivery', reason: (e as Error).message },
-        });
-      }
+    // Called with whatever was supplied. The service takes its silent path for an empty or
+    // unknown id, so no caller-supplied value decides whether a message is attempted.
+    const residentId = String(body?.residentId ?? '');
+    try {
+      await this.platform.getSsoAuth().beginOtpLogin(residentId);
+    } catch (e) {
+      await this.platform.getAudit().record({
+        action: 'sso.login',
+        actor: residentId || 'unknown',
+        outcome: 'failure',
+        metadata: { factor: 'otp', stage: 'delivery', reason: (e as Error).message },
+      });
     }
     return { sent: true };
   }
@@ -123,10 +124,11 @@ export class InteractionController {
   @Post(':uid/otp/verify')
   async otpVerify(@Body() body: OtpVerifyDto, @Req() req: Request, @Res() res: Response) {
     const { residentId, code } = body;
-    const result =
-      residentId && code
-        ? await this.platform.getSsoAuth().verifyOtpLogin(residentId, code)
-        : { authenticated: false, reason: 'MISSING_FIELDS' };
+    // A missing id or code is a code that does not verify: the service is asked either way,
+    // and only its answer decides whether the sign-in proceeds.
+    const result = await this.platform
+      .getSsoAuth()
+      .verifyOtpLogin(String(residentId ?? ''), String(code ?? ''));
 
     if (!result.authenticated || !result.residentId) {
       await this.platform.getAudit().record({
@@ -151,9 +153,10 @@ export class InteractionController {
    */
   @Post(':uid/webauthn/authenticate/start')
   async webauthnAuthStart(@Body() body: AuthStartDto, @Res() res: Response) {
-    const started = body?.residentId
-      ? await this.platform.getWebAuthn().startAuthentication(body.residentId)
-      : null;
+    // An empty id has no passkey enrolled, which is the 204 below.
+    const started = await this.platform
+      .getWebAuthn()
+      .startAuthentication(String(body?.residentId ?? ''));
     if (!started) {
       res.status(204).end();
       return;
@@ -175,12 +178,14 @@ export class InteractionController {
   async webauthnAuthFinish(@Req() req: Request, @Res() res: Response) {
     const { challengeId, credentialId, authenticatorData, clientDataJSON, signature } = (req.body ??
       {}) as Record<string, string>;
-    const result =
-      challengeId && credentialId && authenticatorData && clientDataJSON && signature
-        ? await this.platform
-            .getWebAuthn()
-            .finishAuthentication(challengeId, { credentialId, authenticatorData, clientDataJSON, signature })
-        : ({ ok: false, reason: 'MISSING_FIELDS' } as const);
+    // A missing field is an assertion that does not verify: an empty credential id is an
+    // unknown credential. The service is asked either way.
+    const result = await this.platform.getWebAuthn().finishAuthentication(String(challengeId ?? ''), {
+      credentialId: String(credentialId ?? ''),
+      authenticatorData: String(authenticatorData ?? ''),
+      clientDataJSON: String(clientDataJSON ?? ''),
+      signature: String(signature ?? ''),
+    });
 
     if (!result.ok) {
       await this.platform.getAudit().record({

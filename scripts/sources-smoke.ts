@@ -96,6 +96,10 @@ async function main(): Promise<void> {
   check('entities decode', ent.r.v === 'a & b < c');
   const nons = parseXml('<ns2:Body>keep:me</ns2:Body>', { stripNamespaces: false }) as any;
   check('stripNamespaces:false keeps the prefixed element name', nons['ns2:Body'] === 'keep:me');
+  // Deleting the inner comment assembles a new opener from what is left around it, so one
+  // pass would leave `<!-- <smuggled>…` for the tag scanner to read as an element.
+  const nested = parseXml('<r><!-<!-- a -->- <smuggled>x</smuggled> --><v>ok</v></r>') as any;
+  check('a comment assembled by removing another is removed too', nested.r.v === 'ok' && !('smuggled' in nested.r));
 
   // --- parseCsv unit behaviour ---
   console.log('\nparseCsv:');

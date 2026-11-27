@@ -369,6 +369,23 @@ async function main() {
   });
 
   // No proof at all: we must never mint an unbound credential.
+  // A token names the configurations it authorizes, and the request can only choose among
+  // them. The proof is a real one, so the refusal is about the configuration.
+  await rejects(
+    'a token cannot be used for a configuration it does not carry',
+    'credential_request_denied',
+    () =>
+      vci.credential(`Bearer ${tokX.access_token}`, {
+        credential_configuration_id: 'KE_StateResidencyCredential_ldp_vc',
+        proofs: { jwt: [proofA] },
+      }),
+  );
+  await rejects(
+    'a request naming no configuration and no known format is refused',
+    'unknown_credential_configuration',
+    () => vci.credential(`Bearer ${tokX.access_token}`, { format: 'no_such_format', proofs: { jwt: [proofA] } }),
+  );
+
   await rejects('a request with no key proof is refused', 'invalid_proof', () =>
     vci.credential(`Bearer ${tokX.access_token}`, {
       credential_configuration_id: 'NG_StateResidencyCredential_ldp_vc',
