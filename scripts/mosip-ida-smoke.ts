@@ -71,7 +71,8 @@ function check(name: string, cond: boolean, detail?: string) {
     console.log(`  ✓ ${name}`);
   } else {
     fail++;
-    console.log(`  ✗ ${name}${detail ? `\n      ${redact(detail).replace(/\n|\r/g, ' ')}` : ''}`);
+    console.log(`  ✗ ${name.replace(/\n|\r/g, ' ')}`);
+    if (detail) console.log(`      ${redact(detail).replace(/\n|\r/g, ' ')}`);
   }
 }
 
